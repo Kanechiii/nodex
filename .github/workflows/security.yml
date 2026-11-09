@@ -34,3 +34,5 @@ jobs:
         run: python -m unittest discover -s tests -p '*_check.py' -v
       - name: Audit source and Git history
         run: python scripts/security_audit.py
+      - name: Audit historical bytecode and contributor metadata
+        run: python scripts/history_privacy_audit.py
