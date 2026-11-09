@@ -1,9 +1,7 @@
-"""Nodex interactive console; graph operations belong to NetworkGraph."""
-
 from models.device import Device
 from structures.graph import NetworkGraph
 
-GROUP_NAME = "Nodex Project Team"  # Replace with official section/group name.
+GROUP_NAME = "Nodex Project Team"
 OPERATIONS = (
     ("Add device", "O(V)", "O(1)"),
     ("Remove device", "O(V²)", "O(1)"),
@@ -19,22 +17,20 @@ OPERATIONS = (
 
 
 def seed_network(graph):
-    """Load five demo devices and three links; retain an isolated printer."""
-    examples = (
+    records = (
         (101, "Router-A", "Router", 3),
         (102, "Switch-B", "Switch", 3),
         (103, "PC-C", "Computer", 2),
         (104, "Server-D", "Server", 1),
         (105, "Printer-E", "Printer", 1),
     )
-    for device_id, hostname, device_type, ports in examples:
-        graph.add_device(Device(device_id, hostname, device_type, ports))
+    for dev_id, name, kind, ports in records:
+        graph.add_device(Device(dev_id, name, kind, ports))
     for first, second in ((101, 102), (101, 103), (102, 104)):
         graph.connect_devices(first, second)
 
 
 def read_integer(prompt, minimum=0):
-    """Retry until the user supplies a valid integer."""
     while True:
         raw = input(prompt).strip()
         try:
@@ -49,7 +45,6 @@ def read_integer(prompt, minimum=0):
 
 
 def read_text(prompt):
-    """Read a nonblank hostname or device type."""
     while True:
         value = input(prompt).strip()
         if value:
@@ -58,7 +53,6 @@ def read_text(prompt):
 
 
 def read_yes_no(prompt):
-    """Retry until an explicit yes/no response."""
     while True:
         answer = input(prompt).strip().lower()
         if answer in ("y", "yes"):
@@ -69,7 +63,6 @@ def read_yes_no(prompt):
 
 
 def show_menu(graph):
-    """Display the repeating numbered menu and occupied capacity."""
     print("\n" + "=" * 49)
     print(" NODEX | NETWORK CONNECTIVITY SIMULATOR")
     print(f" Group: {GROUP_NAME}")
@@ -82,25 +75,23 @@ def show_menu(graph):
 
 
 def show_complexity(choice):
-    """Display declared worst-case cost for a graph operation."""
     _, time_cost, space_cost = OPERATIONS[choice - 1]
     print(f"Complexity: time {time_cost} | auxiliary space {space_cost}")
 
 
 def do_operation(graph, choice):
-    """Route one command to the underlying graph API."""
     if choice == 1:
         if graph.get_device_count() == graph.max_devices:
             print("Network is full: remove a device before adding another.")
             return
-        device_id = read_integer("Device ID (0 or greater): ")
-        if graph.search_device(device_id) is not None:
+        dev_id = read_integer("Device ID (0 or greater): ")
+        if graph.search_device(dev_id) is not None:
             print("Error: Duplicate device ID.")
             return
-        hostname = read_text("Hostname: ")
-        device_type = read_text("Device type: ")
+        name = read_text("Hostname: ")
+        kind = read_text("Device type: ")
         ports = read_integer("Port capacity (0 or greater): ")
-        graph.add_device(Device(device_id, hostname, device_type, ports))
+        graph.add_device(Device(dev_id, name, kind, ports))
     elif choice == 2:
         graph.remove_device(read_integer("Device ID to remove: "))
     elif choice in (3, 4, 10):
@@ -119,10 +110,10 @@ def do_operation(graph, choice):
         else:
             print(f"No direct link between {first} and {second}.")
     elif choice == 5:
-        device_id = read_integer("Device ID to search: ")
-        device = graph.search_device(device_id)
+        dev_id = read_integer("Device ID to search: ")
+        device = graph.search_device(dev_id)
         if device is None:
-            print(f"Device {device_id} not found.")
+            print(f"Device {dev_id} not found.")
         else:
             print("Device found:")
             device.display_info()
@@ -146,7 +137,6 @@ def do_operation(graph, choice):
 
 
 def main():
-    """Use one graph instance throughout the console session."""
     graph = NetworkGraph(enforce_port_capacity=True)
     print("Starting Nodex with five sample network devices...")
     seed_network(graph)

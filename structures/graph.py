@@ -1,19 +1,13 @@
-"""Fixed-capacity undirected adjacency-matrix graph for Nodex."""
-
 from models.device import Device
 from algorithms.bfs import bfs_traversal
 from algorithms.dfs import dfs_traversal
 
 
 class NetworkGraph:
-    """Keep up to 10 devices in a basic list and a basic-list matrix."""
+    """Undirected graph with a fixed 10-device adjacency matrix."""
 
     def __init__(self, enforce_port_capacity=True):
-        """Initialize the 10 slots and 10x10 matrix.
-
-        Time O(C^2), stored space O(C^2), where fixed capacity C=10.
-        No other auxiliary collection is required.
-        """
+        """Create device slots and matrix. Time O(C²); stored space O(C²)."""
         self.max_devices = 10
         self.device_count = 0
         self.enforce_port_capacity = enforce_port_capacity
@@ -24,20 +18,14 @@ class NetworkGraph:
             self.adjacency_matrix.append([0] * self.max_devices)
 
     def find_device_index(self, device_id):
-        """Return active array index for the unique ID, else -1.
-
-        Time O(V); auxiliary space O(1).
-        """
+        """Find index by ID or return -1. Time O(V); space O(1)."""
         for i in range(self.device_count):
             if self.devices[i].device_id == device_id:
                 return i
         return -1
 
     def search_device(self, device_id):
-        """Return matching Device object, else None.
-
-        Time O(V); auxiliary space O(1).
-        """
+        """Find a device by ID. Time O(V); space O(1)."""
         index = self.find_device_index(device_id)
         return None if index == -1 else self.devices[index]
 
@@ -46,11 +34,7 @@ class NetworkGraph:
         return self.device_count
 
     def add_device(self, device):
-        """Add a device unless its ID is duplicated or the network is full.
-
-        Validate its port capacity. Return True for success, otherwise False.
-        Time O(V); auxiliary space O(1).
-        """
+        """Insert a valid, unique device. Time O(V); space O(1)."""
         if not isinstance(device, Device):
             print("Error: Expected a Device record.")
             return False
@@ -70,11 +54,7 @@ class NetworkGraph:
         return True
 
     def remove_device(self, device_id):
-        """Remove a device AND its incident edges, compacting rows/columns.
-
-        Keep other device IDs unchanged and surviving edges intact.
-        Return False for a missing ID. Time O(V^2); auxiliary space O(1).
-        """
+        """Remove a device and its links; compact the matrix. Time O(V²); space O(1)."""
         index = self.find_device_index(device_id)
         if index == -1:
             print("Error: Device not found.")
@@ -84,18 +64,12 @@ class NetworkGraph:
         for i in range(index, last):
             self.devices[i] = self.devices[i + 1]
         self.devices[last] = None
-
-        # Remove the corresponding matrix row by moving rows up.
         for i in range(index, last):
             for j in range(self.device_count):
                 self.adjacency_matrix[i][j] = self.adjacency_matrix[i + 1][j]
-
-        # Remove the corresponding matrix column by moving columns left.
         for j in range(index, last):
             for i in range(last):
                 self.adjacency_matrix[i][j] = self.adjacency_matrix[i][j + 1]
-
-        # The newly unused last row and last column must be all zeros.
         for i in range(self.max_devices):
             self.adjacency_matrix[last][i] = 0
             self.adjacency_matrix[i][last] = 0
@@ -105,21 +79,14 @@ class NetworkGraph:
         return True
 
     def count_used_ports(self, index):
-        """Count active connections for an ACTIVE ARRAY INDEX (not an ID).
-
-        Time O(V); auxiliary space O(1).
-        """
+        """Count links by array index, not ID. Time O(V); space O(1)."""
         used_ports = 0
         for j in range(self.device_count):
             used_ports += self.adjacency_matrix[index][j]
         return used_ports
 
     def connect_devices(self, device_id1, device_id2):
-        """Create one undirected link, optionally enforcing available ports.
-
-        Reject unknown IDs, self-links and duplicate links.
-        Time O(V); auxiliary space O(1). Return success boolean.
-        """
+        """Connect two device IDs. Time O(V); space O(1)."""
         index1 = self.find_device_index(device_id1)
         index2 = self.find_device_index(device_id2)
         if index1 == -1 or index2 == -1:
@@ -146,11 +113,7 @@ class NetworkGraph:
         return True
 
     def disconnect_devices(self, device_id1, device_id2):
-        """Delete an existing undirected link, freeing both endpoints' ports.
-
-        Reject unknown IDs, self-links and absent links.
-        Time O(V); auxiliary space O(1). Return success boolean.
-        """
+        """Disconnect two device IDs. Time O(V); space O(1)."""
         index1 = self.find_device_index(device_id1)
         index2 = self.find_device_index(device_id2)
         if index1 == -1 or index2 == -1:
@@ -169,10 +132,7 @@ class NetworkGraph:
         return True
 
     def is_directly_connected(self, device_id1, device_id2):
-        """Return True if both IDs exist and have a direct undirected edge.
-
-        Time O(V); auxiliary space O(1).
-        """
+        """Check if two IDs share a link. Time O(V); space O(1)."""
         index1 = self.find_device_index(device_id1)
         index2 = self.find_device_index(device_id2)
         if index1 == -1 or index2 == -1:
@@ -180,10 +140,7 @@ class NetworkGraph:
         return self.adjacency_matrix[index1][index2] == 1
 
     def display_graph(self):
-        """Print device indexes/IDs, matrix and derived adjacency list.
-
-        Time O(V^2); auxiliary space O(1), excluding terminal output.
-        """
+        """Print devices and links. Time O(V²); space O(1)."""
         print("\n========== NETWORK GRAPH ==========")
         print("\nDevices:")
         for i in range(self.device_count):
@@ -221,15 +178,9 @@ class NetworkGraph:
         print("===================================")
 
     def bfs(self, start_device_id, include_disconnected=False):
-        """Return BFS device-ID order, using a manually indexed queue.
-
-        Time O(V^2); auxiliary space O(V). Delegates to algorithms/bfs.py.
-        """
+        """Return BFS order. Time O(V²); auxiliary space O(V)."""
         return bfs_traversal(self, start_device_id, include_disconnected)
 
     def dfs(self, start_device_id, include_disconnected=False):
-        """Return recursive DFS device-ID order.
-
-        Time O(V^2); auxiliary space O(V). Delegates to algorithms/dfs.py.
-        """
+        """Return DFS order. Time O(V²); auxiliary space O(V)."""
         return dfs_traversal(self, start_device_id, include_disconnected)
