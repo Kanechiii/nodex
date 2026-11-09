@@ -7,18 +7,18 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_SIZE = 5 * 1024 * 1024
-EMAIL = re.compile(rb"(?i)[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}")
+EMAIL = re.compile(rb"(?i)[\w.+-]+@[\w.-]+\.[a-z]{2,}")
 PATHS = (
-    re.compile(rb"(?i)\\b[A-Z]:[\\\\/](?:Users|Documents and Settings)[\\\\/][^\\\\/\\x00\\r\\n]{1,100}"),
-    re.compile(rb"(?i)/(?:home|Users)/[^/\\x00\\r\\n]{1,100}"),
+    re.compile(rb"(?i)\b[A-Z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\x00\r\n]{1,100}"),
+    re.compile(rb"(?i)/(?:home|Users)/[^/\x00\r\n]{1,100}"),
 )
 SECRETS = (
     re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
-    re.compile(rb"\\b(?:AKIA|ASIA)[A-Z0-9]{16}\\b"),
-    re.compile(rb"\\b(?:ghp_|gho_|ghu_|ghs_|ghr_)[A-Za-z0-9]{30,}\\b"),
-    re.compile(rb"\\bgithub_pat_[A-Za-z0-9_]{50,}\\b"),
-    re.compile(rb"\\bsk-(?:proj-)?[A-Za-z0-9_-]{30,}\\b"),
-    re.compile(rb"(?im)^\\s*(?:password|passwd|api_key|secret_key|access_token|auth_token)\\s*[:=]\\s*['\\\"][^'\\\"\\r\\n]{10,}['\\\"]"),
+    re.compile(rb"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b"),
+    re.compile(rb"\b(?:ghp_|gho_|ghu_|ghs_|ghr_)[A-Za-z0-9]{30,}\b"),
+    re.compile(rb"\bgithub_pat_[A-Za-z0-9_]{50,}\b"),
+    re.compile(rb"\bsk-(?:proj-)?[A-Za-z0-9_-]{30,}\b"),
+    re.compile(rb"(?im)^\s*(?:password|passwd|api_key|secret_key|access_token|auth_token)\s*[:=]\s*['\\"][^'\\"\r\n]{10,}['\\"]"),
 )
 
 
