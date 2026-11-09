@@ -1,37 +1,54 @@
-# Nodex — Graph and Traversal Issue
+# Nodex — Network Connectivity Simulator
 
-Console-only Python. Data storage uses a fixed 10-device list and a manually constructed **undirected 10×10 adjacency matrix**. No `dict`, `set`, `deque`, or graph libraries are used for the data structure or traversals. `unittest` is used only for tests.
+Nodex is a Python 3 console-based, graph-driven simulation of a small computer-lab network. A manually implemented **undirected adjacency matrix** tracks up to 10 devices. Its BFS uses an indexed queue, and DFS uses recursion and a visited array.
 
-## Files
+## Quick start
 
-```text
-nodex_issue/
-├── main.py                  # Standalone integration demo; do not overwrite teammate's main.py
-├── models/
-│   ├── __init__.py
-│   └── device.py
-├── structures/
-│   ├── __init__.py
-│   └── graph.py
-├── algorithms/
-│   ├── __init__.py
-│   ├── bfs.py
-│   └── dfs.py
-└── tests/
-    ├── __init__.py
-    ├── test_device.py
-    ├── test_graph.py
-    ├── bfs_check.py
-    └── dfs_check.py
+Open the repository root in VS Code. In the integrated terminal:
+
+```powershell
+py --version
+py main.py
+py -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-## Run in VS Code terminal
+On installations where `python` is on PATH, substitute `python` for `py`. Requires Python 3 and **no third-party packages**. On Windows, if `python` opens a Microsoft Store prompt, use the `py` launcher or fix the Python PATH/app execution aliases.
 
-Open the `nodex_issue` folder as the workspace, then:
+**Important:** The real entry point is the repository's root-level `main.py`, not `src/main.py`.
 
-```bash
-python main.py
-python -m unittest discover -s tests -p '*.py' -v
+## Console operation
+
+The app initializes **five** device records (IDs 101–105) and three valid connections on startup. Device 105 is intentionally disconnected, so BFS/DFS can demonstrate the option to include all components. Data is in memory for each run; changes do not persist after exit.
+
+The numbered menu repeats until **0 — Exit**:
+
+1. Add device
+2. Remove device
+3. Connect devices
+4. Disconnect devices
+5. Search device
+6. Display network topology (devices, matrix, adjacency list)
+7. Breadth-first search (BFS)
+8. Depth-first search (DFS)
+9. Count devices
+10. Check direct link
+
+The console validates numeric input, blank fields, negative IDs/port counts, duplicate IDs, missing devices, self-links, over-capacity insertions, and invalid menu choices. Graph methods handle link duplication and port exhaustion. Each attempted graph operation displays time and auxiliary-space complexity. Set `GROUP_NAME` in `main.py` to the official section and group number before producing final submission screenshots.
+
+## Structure
+
+```text
+main.py                     # Input/output and menu, one NetworkGraph instance
+models/device.py            # Device ID, hostname, type, port capacity
+structures/graph.py         # Custom adjacency-matrix NetworkGraph
+algorithms/bfs.py           # Manual queue BFS
+algorithms/dfs.py           # Recursive DFS
+tests/test_console.py       # Menu and integration tests
+tests/test_graph.py         # Graph correctness tests
+tests/test_device.py        # Device tests
+tests/bfs_check.py          # Traversal checks
+tests/dfs_check.py          # Traversal checks
+DEFENSE_NOTES.md            # Graph and traversal explanations
 ```
 
 ## Integration contract
@@ -44,68 +61,36 @@ graph = NetworkGraph(enforce_port_capacity=True)
 graph.add_device(Device(10, "Router-A", "Router", 4))
 graph.add_device(Device(20, "Switch-B", "Switch", 8))
 graph.connect_devices(10, 20)
-
-# Values returned are DEVICE IDS, not current array indexes:
-print(graph.bfs(10))   # [10, 20]
-print(graph.dfs(10))   # [10, 20]
-print(graph.bfs(10, include_disconnected=True))
+print(graph.search_device(10).hostname)
+print(graph.get_device_count())
+print(graph.is_directly_connected(10, 20))
+graph.display_graph()
+print(graph.bfs(10))
 print(graph.dfs(10, include_disconnected=True))
 ```
 
-If the graph is empty, either traversal returns `[]`. On a nonempty graph, an unknown starting device ID raises `ValueError` (catch this in the console menu and show its message). By default only the reachable component is traversed. Set `include_disconnected=True` to start additional traversals from the lowest unvisited **array index** after completing the initial component. Neighbors are scanned in ascending array-index order. Traversal never mutates graph state.
+Mutation methods return `True` or `False` and print diagnostics. `search_device` returns a `Device` or `None`. `get_device_count` returns an integer. Traversals return device **IDs**, not list positions, and throw `ValueError` for unknown starting IDs on nonempty graphs; they return `[]` on empty graphs. Neighbor exploration follows ascending array index order.
 
-All add/remove/connect/disconnect operations print a diagnostic and return a success Boolean. Searching returns the `Device` instance or `None`; `find_device_index` returns a zero-based array index or `-1`. `get_device_count()` returns an integer. `display_graph()` prints index-to-ID mapping, matrix, and adjacency list.
+## Operation complexity
 
-## Purpose and complexity
+Let **V** be the active device count (at most 10), **C = 10** the fixed capacity, and auxiliary space exclude persistent graph storage and terminal output.
 
-Let **V** be the current number of devices (0–10), and **C=10** be the fixed capacity. Auxiliary space excludes persistent stored records/matrix and excludes the returned traversal order unless stated otherwise.
+| Operation | Time | Auxiliary space |
+| --- | --- | --- |
+| Create graph | O(C²) | O(1) beyond the stored O(C²) matrix |
+| Search / find index | O(V) | O(1) |
+| Add device | O(V) | O(1) |
+| Remove device (matrix reindex) | O(V²) | O(1) |
+| Connect / disconnect | O(V) | O(1) |
+| Count used ports | O(V) | O(1) |
+| Check direct link | O(V) | O(1) |
+| Count devices | O(1) | O(1) |
+| Display topology | O(V²) | O(1) |
+| BFS | O(V²) | O(V) |
+| DFS | O(V²) | O(V) |
 
-| Operation | Purpose | Time | Auxiliary space |
-|---|---|---|---|
-| `Device(...)` | Construct a device record | O(1) | O(1) |
-| `Device.display_info` | Print one device | O(1) | O(1) |
-| `NetworkGraph(...)` | Allocate 10 slots and 10×10 matrix | O(C²) | O(1) beyond O(C²) stored graph |
-| `find_device_index(id)` | Find unique ID's current array index | O(V) | O(1) |
-| `search_device(id)` | Get a record by ID | O(V) | O(1) |
-| `get_device_count()` | Get active count | O(1) | O(1) |
-| `add_device(device)` | Validate and add record | O(V) | O(1) |
-| `remove_device(id)` | Remove record, incident links, compact matrix | O(V²) | O(1) |
-| `count_used_ports(index)` | Count links from an active array index | O(V) | O(1) |
-| `connect_devices(a, b)` | Add symmetric edge; enforce ports optionally | O(V) | O(1) |
-| `disconnect_devices(a, b)` | Clear both symmetric edge entries | O(V) | O(1) |
-| `is_directly_connected(a, b)` | Test immediate connection | O(V) | O(1) |
-| `display_graph()` | Print indexed devices, matrix, derived list | O(V²) | O(1) excluding terminal output |
-| `bfs(id, include_disconnected=False)` | Visit in breadth-first order | O(V²) | O(V) queue + visited; output O(V) |
-| `dfs(id, include_disconnected=False)` | Visit in depth-first recursive preorder | O(V²) | O(V) visited + recursion; output O(V) |
+An adjacency-matrix traversal scans up to V columns per visited device; its time bound is O(V²), not O(V+E). Traversal result lists use O(V) additional output space. IDs stay stable even when internal indexes shift during deletion.
 
-Operation	              Purpose	                                  Time	Auxiliary space
-find_device_index()	      Find a device's array position	          O(V)	O(1)
-add_device()	          Add unique device	                          O(V)	O(1)
-remove_device()	          Remove device and reindex matrix	          O(V²)	O(1)
-search_device()	          Retrieve device record	                  O(V)	O(1)
-connect_devices()	      Connect two devices	                      O(V)	O(1)
-disconnect_devices()      Remove a connection	                      O(V)	O(1)
-count_used_ports()	      Count a device's links	                  O(V)	O(1)
-is_directly_connected()	  Check direct connectivity	                  O(V)	O(1)
-get_device_count()	      Return total devices	                      O(1)	O(1)
-display_graph()	          Print devices and matrix	                  O(V²)	O(1)
-bfs()	                  Level-by-level traversal	                  O(V²)	O(V)
-dfs()	                  Recursive depth-first traversal	          O(V²)	O(V)
+## Submission tasks still required
 
-
-Because capacity is fixed at 10, operations are bounded in actual use. Their O(V) / O(V²) forms express how their work depends on the active number of devices, which is useful for project defense. With an adjacency matrix, scanning one vertex's neighbors checks V columns, so a traversal visiting V vertices takes O(V²), not O(V+E).
-
-## Console integration review checklist (teammate's code not supplied)
-
-- **One shared graph instance.** Do not create a fresh `NetworkGraph` on every menu action.
-- **Input ID versus index.** All menu-facing methods accept `device_id` except the internal helper `count_used_ports(index)`; never pass display indexes as IDs.
-- **Import names.** Use `from structures.graph import NetworkGraph` and `from models.device import Device` with the repo root as the working directory.
-- **Return values.** Display traversal results returned as lists; use Boolean results of mutations to report success/failure without inventing success.
-- **Exceptions.** Catch `ValueError` from `graph.bfs` and `graph.dfs` when the chosen starting device ID does not exist; validate user-entered numeric input where appropriate.
-- **Disconnected choice.** Specify whether the user wants reachable-only or all components (`include_disconnected=True`). The starting device's component always comes first.
-- **Removal.** Graph compacting changes current array indexes; continue identifying devices by stable IDs.
-- **Validation.** Check full capacity, duplicates, missing IDs, self-links, existing links, port limits and isolated nodes via the menu.
-- **No forbidden helpers.** Do not replace the queue with `collections.deque`, and do not replace the graph with dictionaries or sets if course rules prohibit those.
-
-
-See `DEFENSE_NOTES.md` for how to explain BFS/DFS at the final defense.
+The console code and tests do **not** replace the remaining course deliverables: a reviewed/approved PR, official team name, real console screenshots (at least six), the 5–8-page PDF report, a 10-minute defense and the final `Section_GroupNo_Nodex` package. Run and review tests locally before accepting this work.
