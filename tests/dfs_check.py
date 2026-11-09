@@ -1,5 +1,3 @@
-"""DFS tests; filenames do not have to begin with test_."""
-
 import unittest
 from contextlib import redirect_stdout
 from io import StringIO

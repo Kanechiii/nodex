@@ -41,6 +41,3 @@ Edges: (10,20), (10,30), (20,40), (30,40)
 
 **Can DFS overflow?** Recursive DFS can overflow on very large graphs, but Nodex is explicitly limited to 10 devices, so this implementation's maximum depth is 10.
 
-## Project responsibility boundary
-
-This issue delivers data models, graph operations, BFS and DFS, plus example calls and tests. It does **not** modify or verify an unseen teammate's actual console menu. The teammate should integrate the API using the README checklist; inspect their `main.py` before marking the *console integration review* complete.

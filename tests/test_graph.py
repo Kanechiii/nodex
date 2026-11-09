@@ -1,5 +1,3 @@
-"""CRUD, matrix-consistency, capacity and display tests."""
-
 import unittest
 from contextlib import redirect_stdout
 from io import StringIO

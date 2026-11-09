@@ -33,7 +33,7 @@ The numbered menu repeats until **0 — Exit**:
 9. Count devices
 10. Check direct link
 
-The console validates numeric input, blank fields, negative IDs/port counts, duplicate IDs, missing devices, self-links, over-capacity insertions, and invalid menu choices. Graph methods handle link duplication and port exhaustion. Each attempted graph operation displays time and auxiliary-space complexity. Set `GROUP_NAME` in `main.py` to the official section and group number before producing final submission screenshots.
+The console validates numeric input, blank fields, negative IDs/port counts, duplicate IDs, missing devices, self-links, over-capacity insertions, and invalid menu choices. Graph methods handle link duplication and port exhaustion. Each attempted graph operation displays time and auxiliary-space complexity.
 
 ## Structure
 
@@ -91,6 +91,3 @@ Let **V** be the active device count (at most 10), **C = 10** the fixed capacity
 
 An adjacency-matrix traversal scans up to V columns per visited device; its time bound is O(V²), not O(V+E). Traversal result lists use O(V) additional output space. IDs stay stable even when internal indexes shift during deletion.
 
-## Submission tasks still required
-
-The console code and tests do **not** replace the remaining course deliverables: a reviewed/approved PR, official team name, real console screenshots (at least six), the 5–8-page PDF report, a 10-minute defense and the final `Section_GroupNo_Nodex` package. Run and review tests locally before accepting this work.
