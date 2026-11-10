@@ -1,274 +1,335 @@
-# Nodex — Menu Workflows
+# Nodex workflows
 
-This guide follows the **actual Python console implementation** in [`main.py`](../main.py) and [`NetworkGraph`](../structures/graph.py). Nodex uses a **fixed-capacity, undirected 10-device adjacency matrix**, a manually indexed BFS queue and recursive DFS.
+These diagrams document the **current console behavior** in [`main.py`](../main.py), [`graph.py`](../structures/graph.py), [`bfs.py`](../algorithms/bfs.py) and [`dfs.py`](../algorithms/dfs.py). Each menu operation is shown separately rather than combining steps.
 
-## Overall flow
+**Shared input handling:** Numeric prompts repeat until a whole number at least 0 is entered. Text prompts repeat until nonblank. BFS/DFS's Y/N prompt repeats until a valid answer. For any selected operation 1–10, the console prints the operation's **time and auxiliary-space complexity** after completion or an application-level error. Only invalid menu selections and option 0 skip that line.
 
-```mermaid
-flowchart TD
-    A["Start main.py"] --> B["Initialize NetworkGraph"]
-    B --> C["Seed 5 example devices and 3 connections"]
-    C --> D["Display 0–10 menu"]
-    D --> E{"Menu input"}
-    E -->|"0"| X["Exit"]
-    E -->|"Invalid"| W["Explain error and ask again"]
-    E -->|"1–10"| F["Validate required input"]
-    F --> G["Run selected operation"]
-    G --> H["Display outcome and complexity"]
-    H --> D
-    W --> D
-```
-
-**Input rules:** The console retries invalid numbers and blank text fields. Device IDs and port counts must be non-negative integers. Unless an operation is skipped at the menu (e.g., invalid menu choice), it displays its time and auxiliary-space complexity after the attempt.
-
-Each expandable section contains the operation's inputs, implementation flow, expected outcome, and validation paths.
-
-### 1. Add device
-
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
-
-**Inputs:** Device ID, hostname, device type, port capacity.
+## Main loop
 
 ```mermaid
 flowchart TD
-    A["Choose 1"] --> B{"10 devices already present?"}
-    B -->|"Yes"| X["Show network-full error"]
-    B -->|"No"| C["Read non-negative device ID"]
-    C --> D{"ID already exists?"}
-    D -->|"Yes"| Y["Show duplicate-ID error"]
-    D -->|"No"| E["Read nonblank hostname and type"]
-    E --> F["Read non-negative port capacity"]
-    F --> G["Create Device record"]
-    G --> H["Append device to graph's next free slot"]
-    H --> I["Show success"]
+    A["Start"] --> B["Create graph"]
+    B --> C["Add 5 devices"]
+    C --> D["Add 3 links"]
+    D --> E["Show menu"]
+    E --> F["Read choice"]
+    F --> G{"0–10?"}
+    G -->|"No"| H["Input error"]
+    H --> E
+    G -->|"Yes"| I{"Choice = 0?"}
+    I -->|"Yes"| J["Exit"]
+    I -->|"No"| K["Run option"]
+    K --> L["Print result"]
+    L --> M["Print cost"]
+    M --> E
 ```
 
-The graph stores the device in an active slot, preserving its unique ID. **Time O(V), auxiliary space O(1)**.
+## 1. Add device
 
-</details>
-
-### 2. Remove device
-
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
-
-**Input:** Device ID to remove.
+**Input:** ID, hostname, type, port capacity.
 
 ```mermaid
 flowchart TD
-    A["Choose 2"] --> B["Read non-negative device ID"]
-    B --> C["Find device index"]
-    C --> D{"Device found?"}
-    D -->|"No"| X["Show not-found error"]
-    D -->|"Yes"| E["Shift remaining device records left"]
-    E --> F["Compact adjacency-matrix rows"]
-    F --> G["Compact adjacency-matrix columns"]
-    G --> H["Clear unused final row and column"]
-    H --> I["Decrease count and show success"]
+    A["Choose 1"] --> B{"Count = 10?"}
+    B -->|"Yes"| X["Full error"]
+    B -->|"No"| C["Read ID"]
+    C --> D{"ID valid?"}
+    D -->|"No"| C
+    D -->|"Yes"| E{"ID exists?"}
+    E -->|"Yes"| Y["Duplicate error"]
+    E -->|"No"| F["Read name"]
+    F --> G{"Name blank?"}
+    G -->|"Yes"| F
+    G -->|"No"| H["Read type"]
+    H --> I{"Type blank?"}
+    I -->|"Yes"| H
+    I -->|"No"| J["Read ports"]
+    J --> K{"Ports valid?"}
+    K -->|"No"| J
+    K -->|"Yes"| L["Create record"]
+    L --> M["Insert next slot"]
+    M --> N["Count +1"]
+    N --> O["Confirm"]
+    X --> Z["Print cost"]
+    Y --> Z
+    O --> Z
 ```
 
-Removal also removes all links to the deleted device while preserving the other devices' IDs and connections. **Time O(V²), auxiliary space O(1)**.
+The graph checks capacity and uniqueness before insertion. No adjacency-matrix edge is created automatically. **Time O(V), space O(1)**.
 
-</details>
+## 2. Remove device
 
-### 3. Connect devices
-
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
-
-**Inputs:** Two device IDs.
+**Input:** ID.
 
 ```mermaid
 flowchart TD
-    A["Choose 3"] --> B["Read two non-negative IDs"]
-    B --> C{"Both IDs exist?"}
-    C -->|"No"| X["Show missing-device error"]
-    C -->|"Yes"| D{"Two different devices?"}
-    D -->|"No"| Y["Reject self-link"]
-    D -->|"Yes"| E{"Connection already exists?"}
-    E -->|"Yes"| Z["Reject duplicate link"]
-    E -->|"No"| F{"Both have free ports?"}
-    F -->|"No"| W["Show port-capacity error"]
-    F -->|"Yes"| G["Set matrix i,j and j,i to 1"]
-    G --> H["Confirm connection"]
+    A["Choose 2"] --> B["Read ID"]
+    B --> C{"ID valid?"}
+    C -->|"No"| B
+    C -->|"Yes"| D["Find index"]
+    D --> E{"Found?"}
+    E -->|"No"| X["Not found"]
+    E -->|"Yes"| F["Shift records"]
+    F --> G["Shift rows"]
+    G --> H["Shift columns"]
+    H --> I["Clear last row"]
+    I --> J["Clear last col"]
+    J --> K["Count -1"]
+    K --> L["Confirm"]
+    X --> Z["Print cost"]
+    L --> Z
 ```
 
-Each connection uses one port on each endpoint; connections are bidirectional. **Time O(V), auxiliary space O(1)**.
+Removing a device deletes all of its links. Remaining records shift left; their IDs stay unchanged while their matrix indexes may change. **Time O(V²), space O(1)**.
 
-</details>
+## 3. Connect devices
 
-### 4. Disconnect devices
-
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
-
-**Inputs:** Two device IDs.
+**Input:** Two IDs.
 
 ```mermaid
 flowchart TD
-    A["Choose 4"] --> B["Read two non-negative IDs"]
-    B --> C{"Both IDs exist?"}
-    C -->|"No"| X["Show missing-device error"]
-    C -->|"Yes"| D{"IDs different?"}
-    D -->|"No"| Y["Reject self-link"]
-    D -->|"Yes"| E{"Link present?"}
-    E -->|"No"| Z["Report not connected"]
-    E -->|"Yes"| F["Set matrix i,j and j,i to 0"]
-    F --> G["Confirm disconnection"]
+    A["Choose 3"] --> B["Read first ID"]
+    B --> C{"Valid?"}
+    C -->|"No"| B
+    C -->|"Yes"| D["Read second ID"]
+    D --> E{"Valid?"}
+    E -->|"No"| D
+    E -->|"Yes"| F["Find both"]
+    F --> G{"Both found?"}
+    G -->|"No"| X["Missing ID"]
+    G -->|"Yes"| H{"Same device?"}
+    H -->|"Yes"| Y["Self-link error"]
+    H -->|"No"| I{"Already linked?"}
+    I -->|"Yes"| J["Duplicate link"]
+    I -->|"No"| K{"First port free?"}
+    K -->|"No"| L["No free port"]
+    K -->|"Yes"| M{"Second port free?"}
+    M -->|"No"| L
+    M -->|"Yes"| N["Set [i][j] = 1"]
+    N --> O["Set [j][i] = 1"]
+    O --> P["Confirm"]
+    X --> Z["Print cost"]
+    Y --> Z
+    J --> Z
+    L --> Z
+    P --> Z
 ```
 
-The devices remain in the graph; only their direct edge is removed. **Time O(V), auxiliary space O(1)**.
+Each undirected link uses one port on each endpoint. The matrix is updated **symmetrically** only when all checks pass. **Time O(V), space O(1)**.
 
-</details>
+## 4. Disconnect devices
 
-### 5. Search device
-
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
-
-**Input:** Device ID.
+**Input:** Two IDs.
 
 ```mermaid
 flowchart TD
-    A["Choose 5"] --> B["Read non-negative device ID"]
-    B --> C["Scan active records for matching ID"]
-    C --> D{"Found?"}
-    D -->|"No"| E["Show not-found message"]
-    D -->|"Yes"| F["Display ID, hostname, type and port capacity"]
+    A["Choose 4"] --> B["Read first ID"]
+    B --> C{"Valid?"}
+    C -->|"No"| B
+    C -->|"Yes"| D["Read second ID"]
+    D --> E{"Valid?"}
+    E -->|"No"| D
+    E -->|"Yes"| F["Find both"]
+    F --> G{"Both found?"}
+    G -->|"No"| X["Missing ID"]
+    G -->|"Yes"| H{"Same device?"}
+    H -->|"Yes"| Y["Self-link error"]
+    H -->|"No"| I{"Link exists?"}
+    I -->|"No"| J["No link error"]
+    I -->|"Yes"| K["Set [i][j] = 0"]
+    K --> L["Set [j][i] = 0"]
+    L --> M["Confirm"]
+    X --> Z["Print cost"]
+    Y --> Z
+    J --> Z
+    M --> Z
 ```
 
-Search uses the device's **ID**, not its changing array index. **Time O(V), auxiliary space O(1)**.
+Only the edge is removed; both device records remain. **Time O(V), space O(1)**.
 
-</details>
+## 5. Search device
 
-### 6. Display network topology
+**Input:** ID.
 
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
+```mermaid
+flowchart TD
+    A["Choose 5"] --> B["Read ID"]
+    B --> C{"ID valid?"}
+    C -->|"No"| B
+    C -->|"Yes"| D["Scan records"]
+    D --> E{"Found?"}
+    E -->|"No"| X["Not found"]
+    E -->|"Yes"| F["Print ID"]
+    F --> G["Print name"]
+    G --> H["Print type"]
+    H --> I["Print ports"]
+    X --> Z["Print cost"]
+    I --> Z
+```
+
+Search uses the unique **device ID**, not an array index. **Time O(V), space O(1)**.
+
+## 6. Display network topology
 
 **Input:** None.
 
 ```mermaid
 flowchart TD
-    A["Choose 6"] --> B["Print active device records"]
-    B --> C{"Graph empty?"}
-    C -->|"Yes"| D["Show empty-network message"]
-    C -->|"No"| E["Print adjacency matrix by array index"]
-    E --> F["Print adjacency list using device IDs"]
-    F --> G["Finish topology display"]
+    A["Choose 6"] --> B["Print header"]
+    B --> C["List devices"]
+    C --> D{"Count = 0?"}
+    D -->|"Yes"| X["Empty notice"]
+    D -->|"No"| E["Print indexes"]
+    E --> F["Print matrix rows"]
+    F --> G["For each device"]
+    G --> H["Scan links"]
+    H --> I{"Any neighbor?"}
+    I -->|"Yes"| J["Print neighbor IDs"]
+    I -->|"No"| K["Print none"]
+    J --> L{"More devices?"}
+    K --> L
+    L -->|"Yes"| G
+    L -->|"No"| M["Print footer"]
+    X --> Z["Print cost"]
+    M --> Z
 ```
 
-A **1** at position `[i][j]` means the indexed devices share a direct link; a **0** means they do not. The adjacency list shows neighboring **device IDs**, which are easier for learners to follow. **Time O(V²), auxiliary space O(1)**.
+The displayed matrix uses **array indexes**; the adjacency list uses **device IDs**. An isolated device shows no neighbors. **Time O(V²), space O(1)**.
 
-</details>
+## 7. Breadth-first search (BFS)
 
-### 7. Breadth-first search (BFS)
-
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
-
-**Inputs:** Start device ID and whether to include disconnected components.
+**Input:** Starting ID, then whether to include disconnected components.
 
 ```mermaid
 flowchart TD
-    A["Choose 7"] --> B{"Graph empty?"}
-    B -->|"Yes"| X["Explain no devices to traverse"]
-    B -->|"No"| C["Read start ID and Y/N choice"]
-    C --> D{"Start ID exists?"}
-    D -->|"No"| Y["Display traversal error"]
-    D -->|"Yes"| E["Create visited array and indexed queue"]
-    E --> F["Enqueue start, mark visited"]
-    F --> G["Dequeue next device and record its ID"]
-    G --> H["Enqueue unvisited neighbors in ascending index order"]
-    H --> I{"Any queue items left?"}
-    I -->|"Yes"| G
-    I -->|"No"| J{"Include disconnected components?"}
-    J -->|"Yes"| K{"Unvisited device exists?"}
-    K -->|"Yes"| L["Start BFS from next unvisited index"]
-    L --> G
-    K -->|"No"| M["Print traversal order"]
-    J -->|"No"| M
+    A["Choose 7"] --> B{"Count = 0?"}
+    B -->|"Yes"| X["Empty error"]
+    B -->|"No"| C["Read start ID"]
+    C --> D{"ID valid?"}
+    D -->|"No"| C
+    D -->|"Yes"| E["Read Y/N"]
+    E --> F{"Valid Y/N?"}
+    F -->|"No"| E
+    F -->|"Yes"| G["Find start"]
+    G --> H{"Found?"}
+    H -->|"No"| Y["Start error"]
+    H -->|"Yes"| I["Init visited"]
+    I --> J["Init queue"]
+    J --> K["Mark start"]
+    K --> L["Enqueue start"]
+    L --> M{"Queue left?"}
+    M -->|"Yes"| N["Dequeue index"]
+    N --> O["Append ID"]
+    O --> P["Set j = 0"]
+    P --> Q{"j < V?"}
+    Q -->|"Yes"| R{"Link and unseen?"}
+    R -->|"Yes"| S["Mark j"]
+    S --> T["Enqueue j"]
+    T --> U["j +1"]
+    R -->|"No"| U
+    U --> Q
+    Q -->|"No"| M
+    M -->|"No"| W{"Include all?"}
+    W -->|"No"| AA["Print order"]
+    W -->|"Yes"| AB{"Unvisited left?"}
+    AB -->|"No"| AA
+    AB -->|"Yes"| AC["Choose next index"]
+    AC --> AD["Mark + enqueue"]
+    AD --> M
+    X --> Z["Print cost"]
+    Y --> Z
+    AA --> Z
 ```
 
-BFS explores nearer neighbors before deeper levels. The queue is a fixed-size Python list managed using explicit front/rear indexes. **Time O(V²), auxiliary space O(V)**.
+BFS visits a device, then its unvisited neighbors, using a **manually indexed queue** and a Boolean visited array. The queue stores indexes; the printed order uses IDs. With the **Y** option, remaining components are visited in ascending index order. **Time O(V²), space O(V)**.
 
-</details>
+## 8. Depth-first search (DFS)
 
-### 8. Depth-first search (DFS)
-
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
-
-**Inputs:** Start device ID and whether to include disconnected components.
+**Input:** Starting ID, then whether to include disconnected components.
 
 ```mermaid
 flowchart TD
-    A["Choose 8"] --> B{"Graph empty?"}
-    B -->|"Yes"| X["Explain no devices to traverse"]
-    B -->|"No"| C["Read start ID and Y/N choice"]
-    C --> D{"Start ID exists?"}
-    D -->|"No"| Y["Display traversal error"]
-    D -->|"Yes"| E["Create visited array"]
-    E --> F["Visit start recursively"]
-    F --> G["Mark visited and record device ID"]
-    G --> H["Recursively explore each unvisited neighbor in ascending index order"]
-    H --> I["Backtrack when no unvisited neighbors remain"]
-    I --> J{"Include disconnected components?"}
-    J -->|"Yes"| K{"Unvisited device exists?"}
-    K -->|"Yes"| L["Run DFS from next unvisited index"]
-    L --> G
-    K -->|"No"| M["Print traversal order"]
-    J -->|"No"| M
+    A["Choose 8"] --> B{"Count = 0?"}
+    B -->|"Yes"| X["Empty error"]
+    B -->|"No"| C["Read start ID"]
+    C --> D{"ID valid?"}
+    D -->|"No"| C
+    D -->|"Yes"| E["Read Y/N"]
+    E --> F{"Valid Y/N?"}
+    F -->|"No"| E
+    F -->|"Yes"| G["Find start"]
+    G --> H{"Found?"}
+    H -->|"No"| Y["Start error"]
+    H -->|"Yes"| I["Init visited"]
+    I --> J["Call visit(start)"]
+    J --> K["Mark visited"]
+    K --> L["Append ID"]
+    L --> M["Scan j ascending"]
+    M --> N{"Link and unseen?"}
+    N -->|"Yes"| O["Call visit(j)"]
+    O --> P["Return to caller"]
+    P --> Q{"More j?"}
+    N -->|"No"| Q
+    Q -->|"Yes"| M
+    Q -->|"No"| R["Return from visit"]
+    R --> S{"All comps Y?"}
+    S -->|"No"| AA["Print order"]
+    S -->|"Yes"| T{"Unvisited left?"}
+    T -->|"No"| AA
+    T -->|"Yes"| U["Choose next index"]
+    U --> V["Call visit(next)"]
+    V --> S
+    X --> Z["Print cost"]
+    Y --> Z
+    AA --> Z
 ```
 
-DFS follows each branch as far as possible before backtracking. It uses recursion and a visited array, not a built-in stack or visited set. **Time O(V²), auxiliary space O(V)**.
+**Recursive detail:** Every `visit(i)` call marks `i` and appends its ID, scans neighbors in ascending index order, calls `visit(j)` for each linked/unvisited neighbor, and **resumes the caller's scan after that call returns**. When all neighbors are checked, the call returns. The diagram abbreviates the repeated recursive calls, but these steps run at every depth. If **Y** was selected, DFS starts again at each remaining unvisited index. **Time O(V²), space O(V)** including recursion.
 
-</details>
-
-### 9. Count devices
-
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
+## 9. Count devices
 
 **Input:** None.
 
 ```mermaid
-flowchart LR
-    A["Choose 9"] --> B["Read active device_count"]
-    B --> C["Print active devices out of maximum 10"]
+flowchart TD
+    A["Choose 9"] --> B["Read count"]
+    B --> C["Read capacity 10"]
+    C --> D["Print count / 10"]
+    D --> Z["Print cost"]
 ```
 
-Nodex maintains this count as devices are added and removed, so no scan is needed. **Time O(1), auxiliary space O(1)**.
+The graph maintains the counter when devices are added or removed, so counting is constant-time. **Time O(1), space O(1)**.
 
-</details>
+## 10. Check direct link
 
-### 10. Check direct link
-
-<details>
-<summary><strong>View decision-flow diagram</strong></summary>
-
-**Inputs:** Two device IDs.
+**Input:** Two IDs.
 
 ```mermaid
 flowchart TD
-    A["Choose 10"] --> B["Read two non-negative IDs"]
-    B --> C{"Both devices exist?"}
-    C -->|"No"| X["Show missing-device error"]
-    C -->|"Yes"| D{"Same ID?"}
-    D -->|"Yes"| Y["Explain self-links are not allowed"]
-    D -->|"No"| E["Find current indexes of both IDs"]
-    E --> F{"Matrix entry equals 1?"}
-    F -->|"Yes"| G["Report direct link exists"]
-    F -->|"No"| H["Report no direct link"]
+    A["Choose 10"] --> B["Read first ID"]
+    B --> C{"Valid?"}
+    C -->|"No"| B
+    C -->|"Yes"| D["Read second ID"]
+    D --> E{"Valid?"}
+    E -->|"No"| D
+    E -->|"Yes"| F["Search both IDs"]
+    F --> G{"Both found?"}
+    G -->|"No"| X["Missing ID"]
+    G -->|"Yes"| H{"Same ID?"}
+    H -->|"Yes"| Y["Self-link notice"]
+    H -->|"No"| I["Find indexes"]
+    I --> J["Read matrix [i][j]"]
+    J --> K{"Value = 1?"}
+    K -->|"Yes"| L["Link exists"]
+    K -->|"No"| M["No direct link"]
+    X --> Z["Print cost"]
+    Y --> Z
+    L --> Z
+    M --> Z
 ```
 
-This checks a **single direct connection**, not whether two devices can reach one another through intermediate devices. Looking up IDs costs O(V), so **time O(V), auxiliary space O(1)**.
+The check looks for **one edge**, not a multihop route. Searching the two IDs costs O(V); reading a matrix cell after the indexes are known is O(1). **Time O(V), space O(1)**.
 
-</details>
+---
 
-## Traversal example
-
-The sample graph has links `101–102`, `101–103` and `102–104`; device `105` is isolated. With start ID `101`, both algorithms visit the connected component; enabling disconnected components also visits `105`. The exact order is deterministic because neighbors are examined by increasing array index.
-
-[Back to the README](../README.md) · [Contributing](../CONTRIBUTING.md) · [Algorithm defense notes](../DEFENSE_NOTES.md)
+[README](../README.md) · [Contributing](../CONTRIBUTING.md)

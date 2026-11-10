@@ -1,72 +1,35 @@
 # Contributing to Nodex
 
-Thanks for helping improve Nodex. This project teaches graph data structures and traversal algorithms through a small, offline Python console network simulator. Contributions should make the project **clearer, more reliable, easier to learn from, or more capable** without misrepresenting it as real networking software.
+Nodex is a final project for **Data Structures and Algorithms**. Its main purpose is to demonstrate graph representation and traversal in a small, offline Python network-connectivity scenario. Contributions should respect that scope and keep the code readable for students.
 
-## What can be improved?
+## How to contribute
 
-| Area | Possible contributions |
-| --- | --- |
-| **Learning experience** | Step-by-step BFS/DFS traces, clearer matrix explanations, accessible console prompts |
-| **Graph capabilities** | Optional graph import/export, improved edge-case handling, alternative graph representations for comparison |
-| **Testing** | More device-removal, disconnected-network, capacity, and invalid-input tests |
-| **User experience** | Better terminal formatting, clearer help menus, optional interactive tutorials |
-| **Documentation** | Beginner-friendly examples, diagrams, accessibility improvements and translations |
+1. Review [open issues](https://github.com/Kanechiii/nodex/issues) or open one describing a bug, documentation issue, or proposed change. For larger functional changes, discuss the approach before writing code.
+2. Fork the repository or create a feature branch. Keep each change focused.
+3. Update code and tests together when behavior changes. Document how you verified the result.
+4. Run the checks below, then open a pull request against `main`. Explain the problem, your solution, and which tests you ran.
+5. Respond to review feedback. Maintainers review the change and its CI results before merging.
 
-These are **ideas, not existing features**. Propose changes that increase the scope (such as persistence, more than 10 devices, or new dependencies) in an issue before implementing them.
+## Run locally
 
-## Development workflow
-
-1. Check [existing issues](https://github.com/Kanechiii/nodex/issues) and [pull requests](https://github.com/Kanechiii/nodex/pulls) to avoid duplicate work. Open an issue explaining the problem and the proposed improvement for anything nontrivial.
-2. Fork Nodex or create a working branch with a descriptive name such as `feature/bfs-trace`, `fix/device-removal` or `docs/clearer-menu`.
-3. Clone your fork, make a small focused change, and keep the code understandable for beginning Python students.
-4. Add or update tests and documentation for any behavior change. Include examples of success and failure cases.
-5. Run the checks below. Push your branch and open a pull request targeting `main`. Explain what changed, how it was tested, and which issue it addresses.
-6. Address review feedback and wait for the required checks and approval before merging. Prefer **squash and merge** to maintain a readable commit history.
-
-```mermaid
-flowchart LR
-    Issue["Discuss issue"] --> Branch["Create feature branch"]
-    Branch --> Change["Implement and test"]
-    Change --> PR["Open pull request"]
-    PR --> CI["CI and review"]
-    CI -->|"Approved"| Merge["Squash merge"]
-    CI -->|"Changes requested"| Change
-```
-
-## Set up and test
-
-Requires Python 3.11 or later; the app uses the Python standard library.
-
-```bash
-git clone https://github.com/Kanechiii/nodex.git
-cd nodex
-```
-
-Run the app using `py main.py` on Windows or `python3 main.py` on macOS/Linux.
-
-Use `py` on Windows for these test commands (substitute `python3` on macOS/Linux):
+Python 3.11 or newer is recommended; no third-party packages are needed.
 
 ```powershell
+py main.py
 py -m unittest discover -s tests -p "test_*.py" -v
 py -m unittest discover -s tests -p "*_check.py" -v
-py scripts/security_audit.py
-py scripts/history_privacy_audit.py
 ```
 
-The history audit requires a **complete Git clone**, not a ZIP download or shallow checkout. The [CI workflow](https://github.com/Kanechiii/nodex/actions/workflows/security.yml) runs checks on Python 3.11 and 3.13.
+On macOS/Linux, use `python3` instead of `py`. The [security and history checks](SECURITY.md) are available for a full Git clone.
 
-## Implementation guidelines
+## Working with the graph
 
-- Keep **device IDs distinct from array indexes**; removing a device can change indexes.
-- Maintain the **symmetric adjacency matrix** for every undirected connection, and respect device port capacities.
-- Preserve the current manual BFS queue and recursive DFS, including visited arrays and deterministic ascending-index traversal, unless a proposed feature explicitly compares a different implementation.
-- Handle invalid inputs, missing devices, empty networks, duplicate IDs, full capacity, and disconnected components.
-- Document the **time and auxiliary-space complexity** of changed algorithms. Add unit tests that cover the new behavior and regressions.
-- Prefer small, readable Python methods and descriptive names. Avoid third-party dependencies unless discussed and justified.
-- Keep everything offline by default. Do not add real network scanning, credential collection, or device configuration without a separate security/design review.
+- Keep the maximum of **10 devices** unless a scope change has been discussed.
+- Preserve unique device IDs, the **symmetric adjacency matrix**, and port-capacity validation.
+- BFS uses an indexed queue and a visited array; DFS uses recursion and a visited array. Neighbors are examined in ascending index order.
+- Cover invalid input, missing or disconnected devices, duplicate links, and matrix changes after removing a device.
+- Include time and auxiliary-space complexity notes when an algorithm changes.
 
-## Security, licensing and conduct
+See the [menu workflow guide](docs/WORKFLOWS.md) before modifying console behavior. For security-related concerns, follow [SECURITY.md](SECURITY.md) instead of posting sensitive details publicly.
 
-Report vulnerabilities **privately** using [SECURITY.md](SECURITY.md); avoid exposing credentials or exploit details in public issues. By submitting a contribution, you agree that the submitted code can be distributed under the repository's [MIT License](LICENSE) and confirm you have the right to contribute it.
-
-Be constructive and respectful when reviewing work or asking questions. Nodex is a learning project, so explanations and reproducible examples matter as much as code.
+Contributions are distributed under the repository's [MIT License](LICENSE). Please submit only work you have the right to share.
