@@ -45,16 +45,22 @@ def scan_blob(data):
 
 
 def get_blobs():
-    output = git("rev-list", "--objects", "--all").decode("utf-8", "replace")
-    blobs = []
-    seen = set()
-    for line in output.splitlines():
-        sha, separator, path = line.partition(" ")
-        if not separator or not path.lower().endswith(".pyc") or sha in seen:
-            continue
-        seen.add(sha)
-        blobs.append((sha, path))
-    return blobs
+    trees = set(git("log", "--all", "--format=%T").splitlines())
+    found = {}
+    for tree in sorted(trees):
+        entries = git("ls-tree", "-r", "-z", tree.decode("ascii"))
+        for entry in entries.split(b"\x00"):
+            if not entry:
+                continue
+            meta, separator, path = entry.partition(b"\t")
+            if not separator or not path.lower().endswith(b".pyc"):
+                continue
+            parts = meta.split()
+            if len(parts) != 3 or parts[1] != b"blob":
+                continue
+            sha = parts[2].decode("ascii")
+            found.setdefault(sha, path.decode("utf-8", "replace"))
+    return sorted(found.items())
 
 
 def audit():
@@ -70,17 +76,17 @@ def audit():
     findings = 0
     for sha, path in blobs:
         if git("cat-file", "-t", sha).strip() != b"blob":
-            print(f"UNSCANNED {path}: object is not a blob")
+            print(f"UNSCANNED bytecode object {sha[:12]}: not a blob")
             findings += 1
             continue
         size = int(git("cat-file", "-s", sha))
         if size > MAX_SIZE:
-            print(f"UNSCANNED {path}: exceeds size limit")
+            print(f"UNSCANNED bytecode object {sha[:12]}: exceeds size limit")
             findings += 1
             continue
         report = scan_blob(git("cat-file", "blob", sha))
         if any(report.values()):
-            print(f"REVIEW {path}: possible secrets={report['secrets']}, "
+            print(f"REVIEW bytecode object {sha[:12]}: possible secrets={report['secrets']}, "
                   f"email-like strings={report['emails']}, "
                   f"local user paths={report['paths']} (values withheld)")
             findings += 1
