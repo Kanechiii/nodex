@@ -1,5 +1,6 @@
 <div align="center">
   <img src="assets/nodex-banner.svg" width="100%" alt="Nodex — Network Connectivity Simulator. Matte black banner with a white connected-node symbol." />
+  <img src="assets/nodex-graph-loop.gif" width="100%" alt="Looping network graph: connected white nodes and edges moving across a matte-black banner." />
   <p>
     <a href="https://github.com/Kanechiii/nodex/actions/workflows/security.yml"><img alt="Python CI" src="https://github.com/Kanechiii/nodex/actions/workflows/security.yml/badge.svg" /></a>
     <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-333333.svg" /></a>
@@ -8,18 +9,13 @@
 
 ## 🎓 About Nodex
 
+The animated strip above is a decorative illustration of connected graph nodes, not a recording or live simulation.
+
 **Nodex is a final project for the Data Structures and Algorithms course.** We built it to demonstrate how a **graph**, a non-linear data structure, can model a practical problem: representing devices and their connections in a small network.
 
 Each device is a **vertex** and each direct connection is an **edge**. A manually implemented **10 × 10 adjacency matrix** records those links, while **breadth-first search (BFS)** and **depth-first search (DFS)** show different ways to explore them. The project connects classroom concepts to a familiar networking scenario; it does **not** replace a networking simulator.
 
 Nodex is a Python console application. It runs offline, uses no external packages, and keeps all changes in memory until exit.
-
-## ▶️ See it in action
-
-<div align="center">
-  <img src="assets/nodex-demo.gif" width="720" alt="Animated five-slide walkthrough showing Nodex's console menu, sample links, adjacency matrix, BFS order and DFS order." />
-  <p><sub>Auto-playing preview of the five-device sample network. The README is a demonstration, not a live terminal.</sub></p>
-</div>
 
 The sample starts with five devices, three links, and an isolated printer. From device `101`, BFS visits `101 → 102 → 103 → 104`; DFS visits `101 → 102 → 104 → 103`. Select **Include disconnected components** to visit device `105` too.
 
