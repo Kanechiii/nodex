@@ -2,8 +2,13 @@
   <img src="assets/nodex-banner.svg" width="100%" alt="Nodex — Network Connectivity Simulator. Matte black banner with a white connected-node symbol." />
   <img src="assets/nodex-graph-loop.gif" width="100%" alt="Looping network graph: connected white nodes and edges moving across a matte-black banner." />
   <p>
-    <a href="https://github.com/Kanechiii/nodex/actions/workflows/security.yml"><img alt="Python CI" src="https://github.com/Kanechiii/nodex/actions/workflows/security.yml/badge.svg" /></a>
-    <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-333333.svg" /></a>
+    <a href="https://www.python.org/downloads/"><img alt="Python 3.11+" src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&amp;logoColor=white&amp;style=flat" /></a>
+    <a href="https://github.com/Kanechiii/nodex#run-nodex"><img alt="Windows" src="https://img.shields.io/badge/Windows-supported-0078D4?logo=windows11&amp;logoColor=white&amp;style=flat" /></a>
+    <a href="https://github.com/Kanechiii/nodex#run-nodex"><img alt="macOS" src="https://img.shields.io/badge/macOS-supported-555555?logo=apple&amp;logoColor=white&amp;style=flat" /></a>
+    <a href="https://github.com/Kanechiii/nodex#run-nodex"><img alt="Linux" src="https://img.shields.io/badge/Linux-supported-FCC624?logo=linux&amp;logoColor=black&amp;style=flat" /></a>
+    <a href="https://github.com/Kanechiii/nodex/actions/workflows/security.yml"><img alt="CI status" src="https://img.shields.io/github/actions/workflow/status/Kanechiii/nodex/security.yml?branch=main&amp;label=CI&amp;logo=githubactions&amp;logoColor=white&amp;style=flat" /></a>
+    <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-1F883D?logo=opensourceinitiative&amp;logoColor=white&amp;style=flat" /></a>
+    <a href="https://github.com/Kanechiii/nodex/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Kanechiii/nodex?label=release&amp;logo=github&amp;logoColor=white&amp;color=7B61FF&amp;style=flat" /></a>
   </p>
 </div>
 
