@@ -11,7 +11,11 @@ PY_DIRS = ("algorithms", "models", "structures", "tests")
 SCAN_LIMIT = 512 * 1024
 
 SECRET_RULES = (
-    ("private key", re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----")),
+    ("private key", re.compile(
+        rb"-----BEGIN ((?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY)-----[ \\t]*\\r?\\n"
+        rb"(?:(?:[A-Za-z-]+:[^\\r\\n]*\\r?\\n)*\\r?\\n)?"
+        rb"(?:[A-Za-z0-9+/=]{32,128}\\r?\\n)+-----END \\1-----"
+    )),
     ("AWS access key", re.compile(rb"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b")),
     ("GitHub token", re.compile(rb"\b(?:ghp_|gho_|ghu_|ghs_|ghr_)[A-Za-z0-9]{30,}\b")),
     ("GitHub fine-grained token", re.compile(rb"\bgithub_pat_[A-Za-z0-9_]{50,}\b")),
