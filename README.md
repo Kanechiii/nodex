@@ -1,31 +1,27 @@
 <div align="center">
-  <img src="assets/nodex-banner.svg" width="100%" alt="Nodex: a visual network of connected devices with BFS and DFS graph traversal" />
-
-  <h1>Nodex</h1>
-  <p><strong>Explore networks. Understand graphs.</strong></p>
-  <p>An offline Python console simulator for device connectivity, breadth-first search (BFS), and depth-first search (DFS).</p>
-
+  <img src="assets/nodex-banner.svg" width="100%" alt="Nodex — Network Connectivity Simulator. Matte black banner with a white connected-node symbol." />
+  <img src="assets/nodex-graph-loop.gif" width="100%" alt="Looping network graph: connected white nodes and edges moving across a matte-black banner." />
   <p>
-    <a href="https://github.com/Kanechiii/nodex/actions/workflows/security.yml"><img alt="Python tests and security checks" src="https://github.com/Kanechiii/nodex/actions/workflows/security.yml/badge.svg" /></a>
-    <a href="https://github.com/Kanechiii/nodex/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/Kanechiii/nodex?label=release" /></a>
-    <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
-    <img alt="Python 3.11 or newer" src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&amp;logoColor=white" />
-  </p>
-
-  <p>
-    <a href="#quick-start">Quick start</a> ·
-    <a href="#how-it-works">How it works</a> ·
-    <a href="#console-features">Console features</a> ·
-    <a href="#tests-and-security">Tests</a> ·
-    <a href="#license-and-contributors">License</a>
+    <a href="https://github.com/Kanechiii/nodex/actions/workflows/security.yml"><img alt="Python CI" src="https://github.com/Kanechiii/nodex/actions/workflows/security.yml/badge.svg" /></a>
+    <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-333333.svg" /></a>
   </p>
 </div>
 
-## Quick start
+## 🎓 About Nodex
 
-**Requirements:** Python 3.11 or newer. No third-party dependencies.
+**Nodex is a final project for the Data Structures and Algorithms course.** We built it to demonstrate how a **graph**, a non-linear data structure, can model a practical problem: representing devices and their connections in a small network.
 
-**Windows (VS Code / PowerShell)**
+Each device is a **vertex** and each direct connection is an **edge**. A manually implemented **10 × 10 adjacency matrix** records those links, while **breadth-first search (BFS)** and **depth-first search (DFS)** show different ways to explore them. The project connects classroom concepts to a familiar networking scenario; it does **not** replace a networking simulator.
+
+Nodex is a Python console application. It runs offline, uses no external packages, and keeps all changes in memory until exit.
+
+The sample starts with five devices, three links, and an isolated printer. From device `101`, BFS visits `101 → 102 → 103 → 104`; DFS visits `101 → 102 → 104 → 103`. Select **Include disconnected components** to visit device `105` too.
+
+## Run Nodex
+
+Requires **Python 3.11+** and Git. In VS Code or another terminal:
+
+**Windows / PowerShell**
 
 ```powershell
 git clone https://github.com/Kanechiii/nodex.git
@@ -33,8 +29,7 @@ cd nodex
 py main.py
 ```
 
-<details>
-<summary><strong>macOS / Linux commands</strong></summary>
+**macOS / Linux**
 
 ```bash
 git clone https://github.com/Kanechiii/nodex.git
@@ -42,126 +37,73 @@ cd nodex
 python3 main.py
 ```
 
-</details>
+Enter an option from **1–10**, or **0** to exit. Invalid input is handled by the console.
 
-The console starts with **five sample devices** and three links. Select a number from **1–10** to perform an operation; enter **0** to exit. All changes are in memory and reset on restart.
+## What the menu does
 
-## How it works
+Each operation links to its full decision-flow diagram. These are the **implemented** options, not planned features.
 
-<details open>
-<summary><strong>Architecture and sample network</strong> — click to collapse</summary>
+| Option | Function | Option | Function |
+| :---: | --- | :---: | --- |
+| 1 | [Add device](docs/WORKFLOWS.md#1-add-device) | 6 | [Display topology](docs/WORKFLOWS.md#6-display-network-topology) |
+| 2 | [Remove device](docs/WORKFLOWS.md#2-remove-device) | 7 | [BFS](docs/WORKFLOWS.md#7-breadth-first-search-bfs) |
+| 3 | [Connect devices](docs/WORKFLOWS.md#3-connect-devices) | 8 | [DFS](docs/WORKFLOWS.md#8-depth-first-search-dfs) |
+| 4 | [Disconnect devices](docs/WORKFLOWS.md#4-disconnect-devices) | 9 | [Count devices](docs/WORKFLOWS.md#9-count-devices) |
+| 5 | [Search device](docs/WORKFLOWS.md#5-search-device) | 10 | [Check direct link](docs/WORKFLOWS.md#10-check-direct-link) |
 
-### Architecture
-
-```mermaid
-flowchart TD
-    A["Console user"] --> B["main.py · Menu and validation"]
-    B --> C["NetworkGraph · Graph operations"]
-    C --> D["Device records"]
-    C --> E["10 × 10 adjacency matrix"]
-    C --> F["BFS · Manual indexed queue"]
-    C --> G["DFS · Recursive traversal"]
-```
-
-Every device is a **vertex**; each bidirectional link is an **edge**. The matrix stores **1** for a direct connection and **0** otherwise. No graph library, built-in queue class, or visited set is used.
-
-### Default network
+### Application flow
 
 ```mermaid
 flowchart LR
-    A["101 · Router-A"] --- B["102 · Switch-B"]
-    A --- C["103 · PC-C"]
-    B --- D["104 · Server-D"]
-    E["105 · Printer-E<br/>(disconnected)"]
+    A["Start"] --> B["Seed devices"]
+    B --> C["Menu"]
+    C --> D{"Choice"}
+    D -->|"0"| E["Exit"]
+    D -->|"Invalid"| C
+    D -->|"1–10"| F["Read input"]
+    F --> G["Graph or traversal"]
+    G --> H["Result + complexity"]
+    H --> C
 ```
 
-Starting at **101** without disconnected components:
+The console layer reads and validates input; [`NetworkGraph`](structures/graph.py) stores records and edges. BFS uses an indexed queue and a visited array; DFS uses recursion and a visited array. Traversals check neighbors in ascending array-index order.
 
-| Traversal | Visit order |
+See the [complete workflow guide](docs/WORKFLOWS.md) for every decision, error path and matrix update in options 1–10.
+
+## Data structure and complexity
+
+| Concept | Implementation |
 | --- | --- |
-| **BFS** | `101 → 102 → 103 → 104` |
-| **DFS** | `101 → 102 → 104 → 103` |
+| Graph | Undirected; maximum 10 devices |
+| Storage | Fixed adjacency matrix: `1` = linked, `0` = unlinked |
+| Devices | Unique IDs, hostnames, types and port limits |
+| BFS | Manually indexed queue, O(V²) time |
+| DFS | Recursive calls, O(V²) time |
+| Extra traversal space | O(V) for visited state and queue or call stack |
 
-Enable **Include disconnected components** to visit the isolated printer, too.
+Here **V** is the active device count (at most 10). Both traversals take O(V²) time because they scan adjacency-matrix rows, including zero entries. There is no database, live network discovery or packet simulation.
 
-</details>
+Source files: [console](main.py) · [graph](structures/graph.py) · [device](models/device.py) · [BFS](algorithms/bfs.py) · [DFS](algorithms/dfs.py)
 
-## Console features
+## Tests
 
-<details>
-<summary><strong>View all 10 operations</strong></summary>
-
-| # | Operation | # | Operation |
-| --- | --- | --- | --- |
-| 1 | Add device | 6 | Display network topology |
-| 2 | Remove device | 7 | Breadth-first search (BFS) |
-| 3 | Connect devices | 8 | Depth-first search (DFS) |
-| 4 | Disconnect devices | 9 | Count devices |
-| 5 | Search device | 10 | Check direct link |
-
-Nodex validates input, rejects duplicate device IDs and self-links, checks available ports, and displays time and auxiliary-space complexity after each operation.
-
-</details>
-
-<details>
-<summary><strong>Algorithms and complexity</strong></summary>
-
-For **V** active devices (up to 10):
-
-| Operation | Time | Auxiliary space |
-| --- | --- | --- |
-| Count devices | O(1) | O(1) |
-| Add, search, connect, disconnect, direct-link check | O(V) | O(1) |
-| Remove device, display topology | O(V²) | O(1) |
-| BFS, DFS | O(V²) | O(V) |
-
-BFS uses an indexed array queue; DFS uses recursion. Both use visited arrays and traverse neighbors by ascending index. The graph's fixed 10 × 10 matrix requires O(10²) storage.
-
-</details>
-
-<details>
-<summary><strong>Source-code layout</strong></summary>
-
-```text
-nodex/
-├── main.py                    Console menu and input validation
-├── models/device.py           Device record
-├── structures/graph.py        Undirected adjacency matrix
-├── algorithms/bfs.py          BFS with manually indexed queue
-├── algorithms/dfs.py          Recursive DFS
-├── tests/                     Console, graph, traversal, security tests
-├── scripts/                   Security and history audit tools
-├── SECURITY.md                Responsible disclosure policy
-└── DEFENSE_NOTES.md           Algorithm explanations
-```
-
-</details>
-
-## Tests and security
-
-<details>
-<summary><strong>Run tests and security checks</strong></summary>
-
-From the repository root, on Windows:
+Run the standard tests from the repository root:
 
 ```powershell
 py -m unittest discover -s tests -p "test_*.py" -v
 py -m unittest discover -s tests -p "*_check.py" -v
 ```
 
-For the security and Git history audits, use a **full Git clone**:
+For macOS/Linux, replace `py` with `python3`. GitHub Actions runs these tests on Python 3.11 and 3.13. The additional history checks and reporting policy are described in [SECURITY.md](SECURITY.md).
 
-```powershell
-py scripts/security_audit.py
-py scripts/history_privacy_audit.py
-```
+## 🤝 Contributing
 
-On macOS/Linux, replace `py` with `python3`. GitHub Actions checks Python 3.11 and 3.13, unit tests, source code, and reachable Git history. See the [security policy](SECURITY.md) for responsible reporting.
+Bug reports, clearer documentation and code improvements are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request; changes to functionality should include tests and an explanation of the underlying algorithm.
 
-</details>
+## License and authors
 
-## License and contributors
+Licensed under [MIT](LICENSE). Created by [Kenneth Gabriel Alido](https://github.com/Kanechiii) and [Mark Ryan Songalia](https://github.com/gyryan).
 
-Released under the **[MIT License](LICENSE)**. Copyright © 2026 **[Kenneth Gabriel Alido](https://github.com/Kanechiii)** and **[Mark Ryan Songalia](https://github.com/gyryan)**.
+## Disclaimer
 
-Nodex is an **educational simulator**, not a tool for scanning, monitoring, or changing real networks.
+Nodex is **only an educational graph simulation** developed to meet a Data Structures and Algorithms final project requirement. It illustrates network connectivity and traversal; it does not simulate real traffic, configuration or advanced protocols such as VLANs and STP. It is **not a substitute for Cisco Packet Tracer or any other networking simulator**.
