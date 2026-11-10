@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">Nodex network simulator</title>
+  <desc id="desc">Nodex wordmark, graph lines and connected network devices, highlighting breadth-first and depth-first search.</desc>
+  <defs>
+    <linearGradient id="back" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#091126"/>
+      <stop offset=".55" stop-color="#101e3c"/>
+      <stop offset="1" stop-color="#0a2a42"/>
+    </linearGradient>
+    <linearGradient id="aqua" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#4F8CFF"/>
+      <stop offset="1" stop-color="#27DACE"/>
+    </linearGradient>
+    <radialGradient id="haze">
+      <stop stop-color="#24C5DE" stop-opacity=".27"/>
+      <stop offset="1" stop-color="#24C5DE" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0V34" fill="none" stroke="#7197D3" stroke-opacity=".08" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="300" rx="22" fill="url(#back)"/>
+  <rect width="1200" height="300" rx="22" fill="url(#grid)"/>
+  <ellipse cx="1000" cy="158" rx="320" ry="250" fill="url(#haze)"/>
+  <path d="M0 266 Q300 197 602 258 T1200 198" fill="none" stroke="#27DACE" stroke-opacity=".12" stroke-width="2"/>
+  <path d="M0 236 Q310 160 630 218 T1200 160" fill="none" stroke="#75A2FA" stroke-opacity=".1" stroke-width="2"/>
+  <rect x="65" y="57" width="54" height="54" rx="15" fill="#1C3763" stroke="#4BBEF2" stroke-opacity=".8" stroke-width="1.5"/>
+  <path d="M79 85 L91 72 L105 84 L91 97 Z" fill="none" stroke="#62DCFC" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="79" cy="85" r="4" fill="#55AAFF"/>
+  <circle cx="91" cy="72" r="4" fill="#27DACE"/>
+  <circle cx="105" cy="84" r="4" fill="#55AAFF"/>
+  <circle cx="91" cy="97" r="4" fill="#27DACE"/>
+  <text x="65" y="183" font-family="Inter, Segoe UI, Arial, sans-serif" font-weight="800" font-size="86" letter-spacing="-5" fill="#F0F7FF">Nodex</text>
+  <rect x="65" y="197" width="340" height="4" rx="2" fill="url(#aqua)"/>
+  <text x="65" y="235" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" letter-spacing="3" fill="#C2D9F5">NETWORK CONNECTIVITY SIMULATOR</text>
+  <text x="65" y="266" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" letter-spacing="2" fill="#75ACD8">GRAPH STRUCTURES  /  BFS  /  DFS</text>
+  <g fill="none" stroke-linecap="round">
+    <path d="M695 151 L829 74 L960 144 L1090 84" stroke="#4799FF" stroke-opacity=".2" stroke-width="13" filter="url(#glow)"/>
+    <path d="M695 151 L829 74 L960 144 L1090 84" stroke="#4E9BFF" stroke-opacity=".8" stroke-width="3"/>
+    <path d="M695 151 L832 239 L960 144 L1065 239" stroke="#29C8D7" stroke-opacity=".2" stroke-width="13" filter="url(#glow)"/>
+    <path d="M695 151 L832 239 L960 144 L1065 239" stroke="#27DACE" stroke-opacity=".85" stroke-width="3"/>
+    <path d="M829 74 L832 239 M960 144 L1065 239" stroke="#719BE2" stroke-opacity=".25" stroke-width="2" stroke-dasharray="5 8"/>
+  </g>
+  <g>
+    <circle cx="695" cy="151" r="23" fill="#142E53" stroke="#65B7FF" stroke-width="3"/>
+    <circle cx="695" cy="151" r="8" fill="#65B7FF"/>
+    <circle cx="829" cy="74" r="18" fill="#142E53" stroke="#55AEFF" stroke-width="3"/>
+    <circle cx="829" cy="74" r="6" fill="#55AEFF"/>
+    <circle cx="832" cy="239" r="18" fill="#142E53" stroke="#2AD9C8" stroke-width="3"/>
+    <circle cx="832" cy="239" r="6" fill="#2AD9C8"/>
+    <circle cx="960" cy="144" r="23" fill="#142E53" stroke="#58CDE2" stroke-width="3"/>
+    <circle cx="960" cy="144" r="8" fill="#58CDE2"/>
+    <circle cx="1090" cy="84" r="18" fill="#142E53" stroke="#55AEFF" stroke-width="3"/>
+    <circle cx="1090" cy="84" r="6" fill="#55AEFF"/>
+    <circle cx="1065" cy="239" r="18" fill="#142E53" stroke="#2AD9C8" stroke-width="3"/>
+    <circle cx="1065" cy="239" r="6" fill="#2AD9C8"/>
+  </g>
+  <rect x="1112" y="165" width="46" height="25" rx="12" fill="#123A4F" stroke="#2AD9C8" stroke-opacity=".5"/>
+  <text x="1135" y="182" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="11" fill="#75F7DF">BFS</text>
+  <rect x="635" y="213" width="48" height="25" rx="12" fill="#152E52" stroke="#4F8CFF" stroke-opacity=".65"/>
+  <text x="659" y="230" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="11" fill="#B0CEFF">DFS</text>
+</svg>
