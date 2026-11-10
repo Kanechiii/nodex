@@ -18,7 +18,7 @@ SECRETS = (
     re.compile(rb"\b(?:ghp_|gho_|ghu_|ghs_|ghr_)[A-Za-z0-9]{30,}\b"),
     re.compile(rb"\bgithub_pat_[A-Za-z0-9_]{50,}\b"),
     re.compile(rb"\bsk-(?:proj-)?[A-Za-z0-9_-]{30,}\b"),
-    re.compile(rb"(?im)^\s*(?:password|passwd|api_key|secret_key|access_token|auth_token)\s*[:=]\s*['\\"][^'\\"\r\n]{10,}['\\"]"),
+    re.compile(rb'''(?im)^\s*(?:password|passwd|api_key|secret_key|access_token|auth_token)\s*[:=]\s*['"][^'"\r\n]{10,}['"]'''),
 )
 
 
