@@ -2,7 +2,6 @@
   <img src="assets/nodex-banner.svg" width="100%" alt="Nodex: a visual network of connected devices with BFS and DFS graph traversal" />
 
   <h1>Nodex</h1>
-  <p><strong>Explore networks. Understand graphs.</strong></p>
   <p>An offline Python console simulator for device connectivity, breadth-first search (BFS), and depth-first search (DFS).</p>
 
   <p>
@@ -10,14 +9,6 @@
     <a href="https://github.com/Kanechiii/nodex/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/Kanechiii/nodex?label=release" /></a>
     <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
     <img alt="Python 3.11 or newer" src="https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&amp;logoColor=white" />
-  </p>
-
-  <p>
-    <a href="#quick-start">Quick start</a> ·
-    <a href="#how-it-works">How it works</a> ·
-    <a href="#console-features">Console features</a> ·
-    <a href="#tests-and-security">Tests</a> ·
-    <a href="#license-and-contributors">License</a>
   </p>
 </div>
 
