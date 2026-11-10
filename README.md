@@ -9,8 +9,6 @@
 
 ## 🎓 About Nodex
 
-The animated strip above is a decorative illustration of connected graph nodes, not a recording or live simulation.
-
 **Nodex is a final project for the Data Structures and Algorithms course.** We built it to demonstrate how a **graph**, a non-linear data structure, can model a practical problem: representing devices and their connections in a small network.
 
 Each device is a **vertex** and each direct connection is an **edge**. A manually implemented **10 × 10 adjacency matrix** records those links, while **breadth-first search (BFS)** and **depth-first search (DFS)** show different ways to explore them. The project connects classroom concepts to a familiar networking scenario; it does **not** replace a networking simulator.
