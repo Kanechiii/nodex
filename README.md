@@ -266,16 +266,6 @@ On macOS/Linux, replace `py` with `python3`. GitHub Actions checks Python 3.11 a
 
 </details>
 
-## Contributing
-
-Contributions are welcome—especially improvements to graph operations, learning features, accessibility, and automated testing. Please open an issue to discuss larger changes before implementing them, then submit a focused pull request.
-
-Start with the **[contribution guide](CONTRIBUTING.md)** for the development workflow, test commands, and suggested enhancements. Preserve the educational purpose: keep the console usable offline and explain any new data structures or algorithms.
-
-## License and contributors
-
-Released under the **[MIT License](LICENSE)**. Copyright © 2026 **[Kenneth Gabriel Alido](https://github.com/Kanechiii)** and **[Mark Ryan Songalia](https://github.com/gyryan)**.
-
 ## Disclaimer
 
 Nodex is an **educational graph-based network simulator**, not a real network management, monitoring, security scanning, or device configuration tool. Its connections and device records are simulated in memory, and all changes reset when the program closes. It does not emulate packet forwarding, routing protocols, VLANs, STP, or physical network behavior, and it is **not a replacement for Cisco Packet Tracer**. Use it to learn fundamental graph concepts, not to make decisions about operational networks.
