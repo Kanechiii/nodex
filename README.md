@@ -37,27 +37,6 @@ python3 main.py
 
 The console starts with **five sample devices** and three links. Select a number from **1–10** to perform an operation; enter **0** to exit. All changes are in memory and reset on restart.
 
-## Application workflow
-
-Nodex repeats the same cycle until you select **0 — Exit**. The console handles input and messages, while `NetworkGraph` manages devices and the adjacency matrix. Every valid menu operation finishes by displaying its time and auxiliary-space complexity.
-
-```mermaid
-flowchart TD
-    Start["Launch Nodex"] --> Seed["Create graph and seed 5 sample devices"]
-    Seed --> Menu["Display menu (0–10)"]
-    Menu --> Choice{"Select an option"}
-    Choice -->|0| Exit["Exit"]
-    Choice -->|1–6, 9–10| Graph["Validate input and run graph operation"]
-    Choice -->|7–8| Traverse["Validate start and run BFS or DFS"]
-    Choice -->|Invalid| Retry["Show input error"]
-    Graph --> Result["Show result and complexity"]
-    Traverse --> Result
-    Result --> Menu
-    Retry --> Menu
-```
-
-For detailed decision points and diagrams, see **[workflows for all 10 menu operations](docs/WORKFLOWS.md)**.
-
 ## How it works
 
 <details open>
@@ -95,35 +74,6 @@ Starting at **101** without disconnected components:
 | **DFS** | `101 → 102 → 104 → 103` |
 
 Enable **Include disconnected components** to visit the isolated printer, too.
-
-</details>
-
-## Menu operation workflows
-
-<details>
-<summary><strong>Expand all menu actions (1–10)</strong></summary>
-
-Each item describes the live console behavior. Errors are reported without changing the graph, and the menu returns after the attempt.
-
-**1. Add device** — Check the 10-device limit → read a unique non-negative ID, hostname, type, and non-negative port capacity → create and insert the device. Reject duplicates or a full graph. [View flowchart](docs/WORKFLOWS.md#1-add-device).
-
-**2. Remove device** — Read a non-negative ID → locate the device → remove its record and links → compact matrix rows/columns → clear unused slots. Report if missing. [View flowchart](docs/WORKFLOWS.md#2-remove-device).
-
-**3. Connect devices** — Read two IDs → verify both exist, are distinct and not already linked → check both port capacities → set symmetric matrix entries to 1. [View flowchart](docs/WORKFLOWS.md#3-connect-devices).
-
-**4. Disconnect devices** — Read two IDs → verify both exist and are distinct → check the link is present → clear both matrix entries to 0. [View flowchart](docs/WORKFLOWS.md#4-disconnect-devices).
-
-**5. Search device** — Read an ID → find its current array index → display the ID, hostname, type and port capacity, or report not found. [View flowchart](docs/WORKFLOWS.md#5-search-device).
-
-**6. Display network topology** — List active device records → print the indexed adjacency matrix → list each device's neighboring IDs. Show an empty-network message if needed. [View flowchart](docs/WORKFLOWS.md#6-display-network-topology).
-
-**7. Breadth-first search (BFS)** — Check for an empty graph → read a start ID and disconnected-components choice → validate start → visit level by level with an indexed queue and visited array → print IDs. [View flowchart](docs/WORKFLOWS.md#7-breadth-first-search-bfs).
-
-**8. Depth-first search (DFS)** — Check for an empty graph → read a start ID and disconnected-components choice → validate start → recursively visit neighbors with a visited array → print IDs. [View flowchart](docs/WORKFLOWS.md#8-depth-first-search-dfs).
-
-**9. Count devices** — Read the graph's active device counter → display the number in use out of 10. [View flowchart](docs/WORKFLOWS.md#9-count-devices).
-
-**10. Check direct link** — Read two IDs → reject missing devices and self-links → inspect the corresponding matrix entry → report whether a direct link exists. [View flowchart](docs/WORKFLOWS.md#10-check-direct-link).
 
 </details>
 
@@ -175,6 +125,121 @@ nodex/
 ├── SECURITY.md                Responsible disclosure policy
 └── DEFENSE_NOTES.md           Algorithm explanations
 ```
+
+</details>
+
+## Application workflow
+
+Nodex repeats the same cycle until you select **0 — Exit**. The console handles input and messages, while `NetworkGraph` manages devices and the adjacency matrix. Every valid menu operation finishes by displaying its time and auxiliary-space complexity.
+
+```mermaid
+flowchart TD
+    Start["Launch Nodex"] --> Seed["Create graph and seed 5 sample devices"]
+    Seed --> Menu["Display menu (0–10)"]
+    Menu --> Choice{"Select an option"}
+    Choice -->|0| Exit["Exit"]
+    Choice -->|1–6, 9–10| Graph["Validate input and run graph operation"]
+    Choice -->|7–8| Traverse["Validate start and run BFS or DFS"]
+    Choice -->|Invalid| Retry["Show input error"]
+    Graph --> Result["Show result and complexity"]
+    Traverse --> Result
+    Result --> Menu
+    Retry --> Menu
+```
+
+For detailed decision points and diagrams, see **[workflows for all 10 menu operations](docs/WORKFLOWS.md)**.
+
+## Menu operation workflows
+
+Expand an option to see how it works. Each has a separate [decision-flow diagram](docs/WORKFLOWS.md) with validation and error paths.
+
+<details>
+<summary><strong>1 — Add device</strong></summary>
+
+Check capacity → validate unique ID and device details → insert record; report full capacity or duplicate IDs.
+
+[View full flowchart](docs/WORKFLOWS.md#1-add-device)
+
+</details>
+
+<details>
+<summary><strong>2 — Remove device</strong></summary>
+
+Find ID → remove record → shift matrix rows and columns → clear unused slot; report missing IDs.
+
+[View full flowchart](docs/WORKFLOWS.md#2-remove-device)
+
+</details>
+
+<details>
+<summary><strong>3 — Connect devices</strong></summary>
+
+Read IDs → verify devices, distinct endpoints, no existing link and free ports → set both matrix cells to 1.
+
+[View full flowchart](docs/WORKFLOWS.md#3-connect-devices)
+
+</details>
+
+<details>
+<summary><strong>4 — Disconnect devices</strong></summary>
+
+Read IDs → validate devices and existing link → set both matrix cells to 0.
+
+[View full flowchart](docs/WORKFLOWS.md#4-disconnect-devices)
+
+</details>
+
+<details>
+<summary><strong>5 — Search device</strong></summary>
+
+Find device by ID → display record fields or a not-found message.
+
+[View full flowchart](docs/WORKFLOWS.md#5-search-device)
+
+</details>
+
+<details>
+<summary><strong>6 — Display network topology</strong></summary>
+
+Print devices → show indexed adjacency matrix and the per-device adjacency list; handle empty graphs.
+
+[View full flowchart](docs/WORKFLOWS.md#6-display-network-topology)
+
+</details>
+
+<details>
+<summary><strong>7 — Breadth-first search (BFS)</strong></summary>
+
+Validate start and choice to include disconnected components → traverse by indexed queue → display visit order.
+
+[View full flowchart](docs/WORKFLOWS.md#7-breadth-first-search-bfs)
+
+</details>
+
+<details>
+<summary><strong>8 — Depth-first search (DFS)</strong></summary>
+
+Validate start and choice to include disconnected components → traverse recursively → display visit order.
+
+[View full flowchart](docs/WORKFLOWS.md#8-depth-first-search-dfs)
+
+</details>
+
+<details>
+<summary><strong>9 — Count devices</strong></summary>
+
+Read the active device counter → display active devices out of 10.
+
+[View full flowchart](docs/WORKFLOWS.md#9-count-devices)
+
+</details>
+
+<details>
+<summary><strong>10 — Check direct link</strong></summary>
+
+Read IDs → reject missing or identical IDs → inspect matrix edge → report linked or unlinked.
+
+[View full flowchart](docs/WORKFLOWS.md#10-check-direct-link)
 
 </details>
 
