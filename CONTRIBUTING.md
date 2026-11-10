@@ -65,14 +65,6 @@ The history audit requires a **complete Git clone**, not a ZIP download or shall
 - Prefer small, readable Python methods and descriptive names. Avoid third-party dependencies unless discussed and justified.
 - Keep everything offline by default. Do not add real network scanning, credential collection, or device configuration without a separate security/design review.
 
-## Pull-request checklist
-
-- [ ] The change addresses a documented issue or a clearly described improvement.
-- [ ] Tests pass locally and cover important edge cases.
-- [ ] The README or [workflow guide](docs/WORKFLOWS.md) reflects changed menu behavior.
-- [ ] No secrets, private information, compiled files, or unrelated changes are committed.
-- [ ] The pull request explains the approach, testing, and relevant complexity changes.
-
 ## Security, licensing and conduct
 
 Report vulnerabilities **privately** using [SECURITY.md](SECURITY.md); avoid exposing credentials or exploit details in public issues. By submitting a contribution, you agree that the submitted code can be distributed under the repository's [MIT License](LICENSE) and confirm you have the right to contribute it.
