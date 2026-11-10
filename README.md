@@ -1,93 +1,116 @@
-# Nodex — Network Connectivity Simulator
+# Nodex
 
-Nodex is a Python 3 console-based, graph-driven simulation of a small computer-lab network. A manually implemented **undirected adjacency matrix** tracks up to 10 devices. Its BFS uses an indexed queue, and DFS uses recursion and a visited array.
+[![Security and Python checks](https://github.com/Kanechiii/nodex/actions/workflows/security.yml/badge.svg)](https://github.com/Kanechiii/nodex/actions/workflows/security.yml)
+
+**A lightweight, terminal-based network connectivity simulator built to demonstrate graph data structures, BFS, and DFS in Python.**
+
+Nodex models up to **10 devices** with an undirected adjacency matrix. Its graph, BFS queue, and DFS traversal are implemented manually rather than using graph or queue libraries. It runs entirely offline, with **no third-party dependencies**.
 
 ## Quick start
 
-Open the repository root in VS Code. In the integrated terminal:
+**Requirements:** Python 3.11 or newer (CI tests Python 3.11 and 3.13). Run commands from the repository root.
+
+**Windows / VS Code PowerShell**
 
 ```powershell
-py --version
+git clone https://github.com/Kanechiii/nodex.git
+cd nodex
 py main.py
+```
+
+**macOS / Linux**
+
+```bash
+git clone https://github.com/Kanechiii/nodex.git
+cd nodex
+python3 main.py
+```
+
+The menu accepts **0 to exit** and **1–10** for network operations. Each operation displays its time and auxiliary-space complexity.
+
+## How Nodex works
+
+```mermaid
+flowchart TD
+    User["Console user"] --> Menu["main.py — input and menu"]
+    Menu --> Graph["NetworkGraph — graph operations"]
+    Graph --> Records["Device records"]
+    Graph --> Matrix["10 × 10 adjacency matrix"]
+    Graph --> BFS["BFS — manually indexed queue"]
+    Graph --> DFS["DFS — recursive traversal"]
+```
+
+Every device has a unique ID, hostname, type, and port capacity. Connections are bidirectional; the adjacency matrix stores **1** for a link and **0** otherwise. BFS and DFS both use a visited array and explore neighbors in ascending device-index order.
+
+### Default example network
+
+Nodex starts with five devices and three links. The printer is intentionally isolated to demonstrate disconnected components.
+
+```mermaid
+flowchart LR
+    R["101 · Router-A"] --- S["102 · Switch-B"]
+    R --- P["103 · PC-C"]
+    S --- V["104 · Server-D"]
+    I["105 · Printer-E (isolated)"]
+```
+
+For example, starting at device **101** with disconnected components excluded:
+
+- **BFS:** `101 → 102 → 103 → 104`
+- **DFS:** `101 → 102 → 104 → 103`
+
+Choose **Include disconnected components** to visit device 105 as well.
+
+## Features
+
+| Network management | Exploration |
+| --- | --- |
+| Add, remove, and search for devices | Display devices, matrix, and adjacency list |
+| Connect and disconnect devices | Breadth-first search (BFS) |
+| Enforce port capacity and reject invalid links | Depth-first search (DFS) |
+| Count devices and check direct links | Traverse disconnected components |
+
+The console validates user input, duplicate IDs, device limits, and invalid connections. Changes are kept **in memory only** and reset when the program exits.
+
+## Project structure
+
+| Path | Responsibility |
+| --- | --- |
+| [`main.py`](main.py) | Console menu and input validation |
+| [`models/device.py`](models/device.py) | Device records |
+| [`structures/graph.py`](structures/graph.py) | Custom adjacency matrix and graph operations |
+| [`algorithms/bfs.py`](algorithms/bfs.py) | BFS with indexed queue |
+| [`algorithms/dfs.py`](algorithms/dfs.py) | Recursive DFS |
+| [`tests/`](tests) | Graph, menu, traversal, and security tests |
+| [`scripts/`](scripts) | Security and history audits |
+
+## Run the tests
+
+On Windows, from the repository root:
+
+```powershell
 py -m unittest discover -s tests -p "test_*.py" -v
+py -m unittest discover -s tests -p "*_check.py" -v
 ```
 
-On installations where `python` is on PATH, substitute `python` for `py`. Requires Python 3 and **no third-party packages**. On Windows, if `python` opens a Microsoft Store prompt, use the `py` launcher or fix the Python PATH/app execution aliases.
+On macOS/Linux, use `python3` instead of `py`. The same suites run in [GitHub Actions](https://github.com/Kanechiii/nodex/actions/workflows/security.yml).
 
-**Important:** The real entry point is the repository's root-level `main.py`, not `src/main.py`.
+## Complexity at a glance
 
-## Console operation
-
-The app initializes **five** device records (IDs 101–105) and three valid connections on startup. Device 105 is intentionally disconnected, so BFS/DFS can demonstrate the option to include all components. Data is in memory for each run; changes do not persist after exit.
-
-The numbered menu repeats until **0 — Exit**:
-
-1. Add device
-2. Remove device
-3. Connect devices
-4. Disconnect devices
-5. Search device
-6. Display network topology (devices, matrix, adjacency list)
-7. Breadth-first search (BFS)
-8. Depth-first search (DFS)
-9. Count devices
-10. Check direct link
-
-The console validates numeric input, blank fields, negative IDs/port counts, duplicate IDs, missing devices, self-links, over-capacity insertions, and invalid menu choices. Graph methods handle link duplication and port exhaustion. Each attempted graph operation displays time and auxiliary-space complexity.
-
-## Structure
-
-```text
-main.py                     # Input/output and menu, one NetworkGraph instance
-models/device.py            # Device ID, hostname, type, port capacity
-structures/graph.py         # Custom adjacency-matrix NetworkGraph
-algorithms/bfs.py           # Manual queue BFS
-algorithms/dfs.py           # Recursive DFS
-tests/test_console.py       # Menu and integration tests
-tests/test_graph.py         # Graph correctness tests
-tests/test_device.py        # Device tests
-tests/bfs_check.py          # Traversal checks
-tests/dfs_check.py          # Traversal checks
-DEFENSE_NOTES.md            # Graph and traversal explanations
-```
-
-## Integration contract
-
-```python
-from models.device import Device
-from structures.graph import NetworkGraph
-
-graph = NetworkGraph(enforce_port_capacity=True)
-graph.add_device(Device(10, "Router-A", "Router", 4))
-graph.add_device(Device(20, "Switch-B", "Switch", 8))
-graph.connect_devices(10, 20)
-print(graph.search_device(10).hostname)
-print(graph.get_device_count())
-print(graph.is_directly_connected(10, 20))
-graph.display_graph()
-print(graph.bfs(10))
-print(graph.dfs(10, include_disconnected=True))
-```
-
-Mutation methods return `True` or `False` and print diagnostics. `search_device` returns a `Device` or `None`. `get_device_count` returns an integer. Traversals return device **IDs**, not list positions, and throw `ValueError` for unknown starting IDs on nonempty graphs; they return `[]` on empty graphs. Neighbor exploration follows ascending array index order.
-
-## Operation complexity
-
-Let **V** be the active device count (at most 10), **C = 10** the fixed capacity, and auxiliary space exclude persistent graph storage and terminal output.
+Let **V** be the number of active devices (maximum 10).
 
 | Operation | Time | Auxiliary space |
 | --- | --- | --- |
-| Create graph | O(C²) | O(1) beyond the stored O(C²) matrix |
-| Search / find index | O(V) | O(1) |
-| Add device | O(V) | O(1) |
-| Remove device (matrix reindex) | O(V²) | O(1) |
-| Connect / disconnect | O(V) | O(1) |
-| Count used ports | O(V) | O(1) |
-| Check direct link | O(V) | O(1) |
 | Count devices | O(1) | O(1) |
-| Display topology | O(V²) | O(1) |
-| BFS | O(V²) | O(V) |
-| DFS | O(V²) | O(V) |
+| Add, search, connect, disconnect, direct-link check | O(V) | O(1) |
+| Remove device or display topology | O(V²) | O(1) |
+| BFS and DFS | O(V²) | O(V) |
 
-An adjacency-matrix traversal scans up to V columns per visited device; its time bound is O(V²), not O(V+E). Traversal result lists use O(V) additional output space. IDs stay stable even when internal indexes shift during deletion.
+The fixed 10 × 10 matrix stores **O(10²)** entries; traversal return lists use another O(V) of output space. Because the graph uses a matrix, traversal is O(V²), not O(V + E).
 
+## Security and project notes
+
+- [Security policy and responsible reporting](SECURITY.md)
+- [Algorithm explanations for project defense](DEFENSE_NOTES.md)
+- **Educational simulation only:** Nodex does not discover, scan, or configure real networks.
+- **Licensing:** No license is currently specified. Public visibility does not itself grant permission to reuse or redistribute the code.

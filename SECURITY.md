@@ -1,32 +1,48 @@
-# Pre-publication security review
+# Security Policy
 
-The Nodex application is a local Python console simulation. It does not require network access, cloud credentials, or third-party packages.
+Nodex is an **offline Python learning project**, not a production network monitor or security scanner. It uses no cloud credentials, third-party packages, or external services at runtime.
 
-## Automated checks
+## Supported code
 
-The [Security and Python checks](.github/workflows/security.yml) workflow runs on pull requests and pushes to `main`. It uses read-only repository permissions and pinned GitHub Actions commit SHAs. It tests Python 3.11 and 3.13, checks syntax, runs core/console tests and both traversal suites, and audits the tracked source plus reachable Git blob history for known secret patterns, suspicious credential filenames, and risky Python calls. The audit intentionally redacts any matching secret values.
+Security fixes and reports concern the current `main` branch. No separately maintained release series has been announced.
 
-To reproduce the checks locally:
+## Reporting a vulnerability
+
+**Do not publish credentials, exploit details, or private information in a public GitHub issue.**
+
+If GitHub's private vulnerability reporting is enabled, open the repository **Security** tab and choose **Report a vulnerability**. Otherwise, contact the repository maintainers through a trusted private channel before sharing sensitive details. Include the affected file, reproduction steps, and likely impact; remove any real secrets from the report.
+
+## Built-in protections
+
+- **Local-only operation:** device records and connections exist in memory and are discarded on exit.
+- **Input validation:** the menu handles invalid numbers, missing devices, duplicate IDs, self-links, and exhausted ports.
+- **Automated review:** the [Security and Python checks](.github/workflows/security.yml) workflow runs on pull requests and pushes to `main`. It uses read-only permissions and tests Python 3.11 and 3.13.
+
+```mermaid
+flowchart LR
+    Changes["Pull request or push"] --> CI["Python 3.11 and 3.13"]
+    CI --> Tests["Syntax and unit tests"]
+    CI --> Source["Source and Git-history audit"]
+    CI --> Binary["Historical bytecode audit"]
+```
+
+The audits detect selected secret signatures, risky Python calls, and possible sensitive strings in historical bytecode. **A passing scan is not proof that the repository is free of vulnerabilities or sensitive information.**
+
+## Verify locally
+
+Run these commands from a **full Git clone**, not a ZIP download or shallow clone, so the history checks can inspect reachable commits.
 
 ```powershell
-py -m compileall -q main.py algorithms models structures tests scripts
 py -m unittest discover -s tests -p "test_*.py" -v
 py -m unittest discover -s tests -p "*_check.py" -v
 py scripts/security_audit.py
+py scripts/history_privacy_audit.py
 ```
 
-Run the script from a complete Git clone, not a downloaded ZIP. A shallow clone cannot expose all historical objects; on CI, checkout uses `fetch-depth: 0`.
+Use `python3` instead of `py` on macOS/Linux.
 
-## Required checks before changing visibility to public
+## Historical data and responsible contributions
 
-1. Require an independent code review and a successful Security and Python checks workflow on the final `main` commit. GitHub branch protection is currently disabled; configure an appropriate ruleset before relying on checks.
-2. Inspect **all Git history**, tags, PR branches, and releases for secrets, private files, personal information, and materials without permission to distribute. A pattern scanner can miss unknown formats and secrets not matched by its rules.
-3. Review commit author/committer email addresses, contributor identities, issue/PR discussions, screenshots, and document metadata. GitHub exposes repository history on public repositories. The audit reports only the number of email addresses; review actual values privately.
-4. Confirm there are no leaked access tokens, credentials, certificates or private keys. If one is found, revoke/rotate it **before** any history rewrite. Deleting a file in a later commit does not remove prior versions.
-5. Enable GitHub's available secret scanning, push protection, and dependency/security features as supported by the repository/account. Review security alerts in GitHub's Security tab.
-6. Audit linked content, dependencies, and any pending local changes not yet pushed. Check third-party code licenses and verify the project can be redistributed.
-7. Re-run all checks on the final merged commit and only then decide whether to change visibility. This PR deliberately does not change repository settings.
+Git history can expose earlier author email addresses and previously committed files even after they are removed from `main`. Never commit passwords, API keys, private keys, real user records, or confidential files. If a secret is exposed, **revoke or rotate it first**; a later deletion or successful scan does not remove historical exposure.
 
-## Limits
-
-The scanner uses signatures and AST heuristics; a pass is **not** proof that the project is vulnerability-free. In particular, it does not test package vulnerabilities, history held only in unreachable objects, external services, CI secrets, collaborators' local files, or information posted outside tracked source files.
+Before merging changes, review the diff and required checks. The audit tools are read-only and intentionally avoid printing matched secret values.
