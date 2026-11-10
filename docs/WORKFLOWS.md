@@ -23,8 +23,10 @@ flowchart TD
 
 Each expandable section contains the operation's inputs, implementation flow, expected outcome, and validation paths.
 
+### 1. Add device
+
 <details>
-<summary><strong>1 — Add device</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Inputs:** Device ID, hostname, device type, port capacity.
 
@@ -46,8 +48,10 @@ The graph stores the device in an active slot, preserving its unique ID. **Time 
 
 </details>
 
+### 2. Remove device
+
 <details>
-<summary><strong>2 — Remove device</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Input:** Device ID to remove.
 
@@ -68,8 +72,10 @@ Removal also removes all links to the deleted device while preserving the other 
 
 </details>
 
+### 3. Connect devices
+
 <details>
-<summary><strong>3 — Connect devices</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Inputs:** Two device IDs.
 
@@ -92,8 +98,10 @@ Each connection uses one port on each endpoint; connections are bidirectional. *
 
 </details>
 
+### 4. Disconnect devices
+
 <details>
-<summary><strong>4 — Disconnect devices</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Inputs:** Two device IDs.
 
@@ -114,8 +122,10 @@ The devices remain in the graph; only their direct edge is removed. **Time O(V),
 
 </details>
 
+### 5. Search device
+
 <details>
-<summary><strong>5 — Search device</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Input:** Device ID.
 
@@ -132,8 +142,10 @@ Search uses the device's **ID**, not its changing array index. **Time O(V), auxi
 
 </details>
 
+### 6. Display network topology
+
 <details>
-<summary><strong>6 — Display network topology</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Input:** None.
 
@@ -151,8 +163,10 @@ A **1** at position `[i][j]` means the indexed devices share a direct link; a **
 
 </details>
 
+### 7. Breadth-first search (BFS)
+
 <details>
-<summary><strong>7 — Breadth-first search (BFS)</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Inputs:** Start device ID and whether to include disconnected components.
 
@@ -181,8 +195,10 @@ BFS explores nearer neighbors before deeper levels. The queue is a fixed-size Py
 
 </details>
 
+### 8. Depth-first search (DFS)
+
 <details>
-<summary><strong>8 — Depth-first search (DFS)</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Inputs:** Start device ID and whether to include disconnected components.
 
@@ -210,8 +226,10 @@ DFS follows each branch as far as possible before backtracking. It uses recursio
 
 </details>
 
+### 9. Count devices
+
 <details>
-<summary><strong>9 — Count devices</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Input:** None.
 
@@ -225,8 +243,10 @@ Nodex maintains this count as devices are added and removed, so no scan is neede
 
 </details>
 
+### 10. Check direct link
+
 <details>
-<summary><strong>10 — Check direct link</strong></summary>
+<summary><strong>View decision-flow diagram</strong></summary>
 
 **Inputs:** Two device IDs.
 
