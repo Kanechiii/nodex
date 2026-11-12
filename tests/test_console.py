@@ -47,18 +47,18 @@ class ConsoleTests(unittest.TestCase):
         self.assertIn("Direct link exists", self.run_operation(10, ("103", "105")))
         self.assertIn("disconnected.", self.run_operation(4, ("103", "105")))
         self.assertIn("No direct link", self.run_operation(10, ("103", "105")))
-        self.assertIn("not found", self.run_operation(2, ("999",)))
+        self.assertIn("Device not found", self.run_operation(2, ("999", "b")))
 
     def test_bfs_dfs_disconnected_and_topology(self):
         self.assertIn("101 -> 102 -> 103 -> 104", self.run_operation(7, ("101", "n")))
         self.assertIn("101 -> 102 -> 104 -> 103 -> 105", self.run_operation(8, ("101", "y")))
-        self.assertIn("Traversal error", self.run_operation(7, ("999", "n")))
+        self.assertIn("Device not found", self.run_operation(7, ("999", "101", "n")))
         self.assertIn("Adjacency Matrix", self.run_operation(6))
 
     def test_bad_input_duplicate_and_self_link(self):
         output = self.run_operation(1, ("abc", "-1", "106", "", "Laptop", "", "PC", "-2", "2"))
         self.assertIn("Invalid input", output)
-        self.assertIn("Duplicate device ID", self.run_operation(1, ("101",)))
+        self.assertIn("Duplicate device ID", self.run_operation(1, ("101", "b")))
         self.assertIn("cannot connect to itself", self.run_operation(3, ("101", "101")))
 
     def test_full_and_empty_graph(self):
@@ -71,6 +71,62 @@ class ConsoleTests(unittest.TestCase):
         with redirect_stdout(out):
             console.do_operation(empty, 7)
         self.assertIn("Network is empty", out.getvalue())
+
+
+    def test_back_at_each_input_stage_does_not_change_graph(self):
+        scenarios = (
+            (1, ("b",)),
+            (1, ("106", "b")),
+            (1, ("106", "Laptop", "b")),
+            (1, ("106", "Laptop", "PC", "b")),
+            (2, ("b",)),
+            (3, ("b",)),
+            (3, ("101", "b")),
+            (4, ("b",)),
+            (4, ("101", "b")),
+            (5, ("b",)),
+            (7, ("b",)),
+            (7, ("101", "b")),
+            (8, ("b",)),
+            (8, ("101", "b")),
+            (10, ("b",)),
+            (10, ("101", "b")),
+        )
+        for choice, answers in scenarios:
+            with self.subTest(choice=choice, answers=answers):
+                before_ids = [device.device_id for device in self.graph.devices if device]
+                before_matrix = [row[:] for row in self.graph.adjacency_matrix]
+                output = self.run_operation(choice, answers)
+                self.assertIn("Operation canceled", output)
+                self.assertEqual(before_ids, [device.device_id for device in self.graph.devices if device])
+                self.assertEqual(before_matrix, self.graph.adjacency_matrix)
+
+    def test_back_word_is_case_insensitive(self):
+        for token in ("B", "back", "BACK", "Back"):
+            with self.subTest(token=token):
+                self.assertIn("Operation canceled", self.run_operation(5, (token,)))
+
+    def test_retry_duplicate_and_missing_ids_without_restarting(self):
+        output = self.run_operation(1, ("101", "106", "Laptop-F", "Computer", "1"))
+        self.assertIn("Duplicate device ID", output)
+        self.assertIsNotNone(self.graph.search_device(106))
+        output = self.run_operation(3, ("999", "101", "998", "106"))
+        self.assertIn("Device not found", output)
+        self.assertIn("connected.", output)
+        self.assertTrue(self.graph.is_directly_connected(101, 106))
+        output = self.run_operation(8, ("777", "101", "maybe", "n"))
+        self.assertIn("Device not found", output)
+        self.assertIn("Invalid input: enter Y or N", output)
+        self.assertIn("DFS visit order", output)
+
+    def test_main_returns_to_menu_after_cancel(self):
+        out = StringIO()
+        with patch("builtins.input", side_effect=("1", "106", "Laptop", "b", "9", "0")), redirect_stdout(out):
+            console.main()
+        output = out.getvalue()
+        self.assertIn("Operation canceled", output)
+        self.assertIn("Active devices: 5", output)
+        self.assertEqual(output.count("Complexity:"), 1)
 
     def test_invalid_menu_and_exit(self):
         out = StringIO()
