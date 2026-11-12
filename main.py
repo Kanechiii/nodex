@@ -30,9 +30,19 @@ def seed_network(graph):
         graph.connect_devices(first, second)
 
 
+class BackToMenu(Exception):
+    """User canceled the current operation before it could finish."""
+
+
+def check_back(value):
+    if value.lower() in ("b", "back"):
+        raise BackToMenu
+
+
 def read_integer(prompt, minimum=0):
     while True:
         raw = input(prompt).strip()
+        check_back(raw)
         try:
             number = int(raw)
         except ValueError:
@@ -47,6 +57,7 @@ def read_integer(prompt, minimum=0):
 def read_text(prompt):
     while True:
         value = input(prompt).strip()
+        check_back(value)
         if value:
             return value
         print("Invalid input: this field cannot be blank.")
@@ -55,11 +66,21 @@ def read_text(prompt):
 def read_yes_no(prompt):
     while True:
         answer = input(prompt).strip().lower()
+        check_back(answer)
         if answer in ("y", "yes"):
             return True
         if answer in ("n", "no"):
             return False
         print("Invalid input: enter Y or N.")
+
+
+def read_existing_device_id(graph, prompt):
+    """Retry a mistyped device ID without restarting the current operation."""
+    while True:
+        dev_id = read_integer(prompt)
+        if graph.search_device(dev_id) is not None:
+            return dev_id
+        print("Error: Device not found. Try again or enter B to go back.")
 
 
 def show_menu(graph):
@@ -71,6 +92,7 @@ def show_menu(graph):
     for index, (label, _, _) in enumerate(OPERATIONS, start=1):
         print(f" {index:2}. {label}")
     print("  0. Exit")
+    print(" Enter B (Back) at any operation prompt to return to this menu.")
     print("=" * 49)
 
 
@@ -80,23 +102,34 @@ def show_complexity(choice):
 
 
 def do_operation(graph, choice):
+    """Run an operation; return False if the user backs out."""
+    try:
+        _perform_operation(graph, choice)
+    except BackToMenu:
+        print("Operation canceled. Returning to the main menu.")
+        return False
+    return True
+
+
+def _perform_operation(graph, choice):
     if choice == 1:
         if graph.get_device_count() == graph.max_devices:
             print("Network is full: remove a device before adding another.")
             return
-        dev_id = read_integer("Device ID (0 or greater): ")
-        if graph.search_device(dev_id) is not None:
-            print("Error: Duplicate device ID.")
-            return
+        while True:
+            dev_id = read_integer("Device ID (0 or greater): ")
+            if graph.search_device(dev_id) is None:
+                break
+            print("Error: Duplicate device ID. Try another ID or enter B to go back.")
         name = read_text("Hostname: ")
         kind = read_text("Device type: ")
         ports = read_integer("Port capacity (0 or greater): ")
         graph.add_device(Device(dev_id, name, kind, ports))
     elif choice == 2:
-        graph.remove_device(read_integer("Device ID to remove: "))
+        graph.remove_device(read_existing_device_id(graph, "Device ID to remove: "))
     elif choice in (3, 4, 10):
-        first = read_integer("First device ID: ")
-        second = read_integer("Second device ID: ")
+        first = read_existing_device_id(graph, "First device ID: ")
+        second = read_existing_device_id(graph, "Second device ID: ")
         if choice == 3:
             graph.connect_devices(first, second)
         elif choice == 4:
@@ -123,7 +156,7 @@ def do_operation(graph, choice):
         if graph.get_device_count() == 0:
             print("Network is empty: no devices to traverse.")
             return
-        start = read_integer("Starting device ID: ")
+        start = read_existing_device_id(graph, "Starting device ID: ")
         include_all = read_yes_no("Include disconnected components? [Y/N]: ")
         try:
             order = graph.bfs(start, include_all) if choice == 7 else graph.dfs(start, include_all)
@@ -156,9 +189,12 @@ def main():
                 print("Invalid menu selection: enter a number from 0 to 10.")
                 continue
             try:
-                do_operation(graph, choice)
-            finally:
-                show_complexity(choice)
+                completed = do_operation(graph, choice)
+            except (EOFError, KeyboardInterrupt):
+                raise
+            else:
+                if completed:
+                    show_complexity(choice)
     except (EOFError, KeyboardInterrupt):
         print("\nExiting Nodex. Goodbye!")
 
