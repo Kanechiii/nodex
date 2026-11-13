@@ -1,5 +1,6 @@
 from models.device import Device
 from structures.graph import NetworkGraph
+import console_ui
 
 GROUP_NAME = "Nodex Project Team"
 OPERATIONS = (
@@ -84,16 +85,7 @@ def read_existing_device_id(graph, prompt):
 
 
 def show_menu(graph):
-    print("\n" + "=" * 49)
-    print(" NODEX | NETWORK CONNECTIVITY SIMULATOR")
-    print(f" Group: {GROUP_NAME}")
-    print(f" Devices: {graph.get_device_count()}/{graph.max_devices}")
-    print("=" * 49)
-    for index, (label, _, _) in enumerate(OPERATIONS, start=1):
-        print(f" {index:2}. {label}")
-    print("  0. Exit")
-    print(" Enter B (Back) at any operation prompt to return to this menu.")
-    print("=" * 49)
+    console_ui.show_menu(graph, OPERATIONS, GROUP_NAME)
 
 
 def show_complexity(choice):
@@ -103,6 +95,7 @@ def show_complexity(choice):
 
 def do_operation(graph, choice):
     """Run an operation; return False if the user backs out."""
+    console_ui.show_operation(choice, OPERATIONS)
     try:
         _perform_operation(graph, choice)
     except BackToMenu:
@@ -171,6 +164,7 @@ def _perform_operation(graph, choice):
 
 def main():
     graph = NetworkGraph(enforce_port_capacity=True)
+    console_ui.show_splash()
     print("Starting Nodex with five sample network devices...")
     seed_network(graph)
     try:
