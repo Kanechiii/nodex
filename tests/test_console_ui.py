@@ -32,7 +32,7 @@ class ConsolePresentationTests(unittest.TestCase):
             with redirect_stdout(out):
                 console_ui.show_splash()
                 main.show_menu(self.graph)
-        self.assertNotIn("\\x1b[", out.getvalue())
+        self.assertNotIn(chr(27) + "[", out.getvalue())
         self.assertIn("NODEX", out.getvalue())
 
     def test_operation_header_does_not_change_graph(self):
